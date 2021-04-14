@@ -19,11 +19,7 @@
         echo "<h2>". $_GET["amount"] . "</h2>";
 
         $url = 'http://blitz.cs.niu.edu/CreditCard/';
-        $num = rand(100,999);
-        $num .= '-';
-        $num .= rand(100000000,999999999);
-        $num .= '-';
-        $num .= rand(100,999);
+        $num = rand(100,999) . '-' . rand(100000000,999999999) . '-' . rand(100,999);
         $data = array(
             'vendor' => 'VE0005-99',
             'trans' => $num,
@@ -42,49 +38,13 @@
 
         $context  = stream_context_create($options);
         $result = file_get_contents($url, false, $context);
-        echo($result);
+        $obj = json_decode($result);
+        if($obj->authorization) {
+            // Authorized Logic
+        } else {
+            // Denied Logic
+        }
 
-        // $partWeight = 0;
-        // $partPrice = 0;
-        // $partId = $_GET["description"];
-        // foreach($rowsParts as $rowPart){
-        //     if ($partId == $rowPart["number"]) {
-        //         $partDesc = $rowPart["description"];
-        //         $partWeight = $rowPart["weight"] * $_GET["quantity"];
-        //         $partPrice = $rowPart["price"] * $_GET["quantity"];
-        //     }
-        // }
-
-        // #
-        // #Status needs to be Completed
-        // #
-        // $sql = "insert into Order_(ordered_date,customer_id,Status,weight_total,price_total) values ('${_GET["ordered_date"]}','${_GET["customer"]}','Ordered','$partWeight','$partPrice');";
-    
-        // if ($pdo->query($sql) == TRUE) 
-        // {
-        //     echo "Order, Record created successfully";
-
-        //     $orderId = $pdo->lastInsertId();
-        //     $sql = "insert into Part_Order(order_id,part_num,item_name,quantity) values ($orderId,'$partId','$partDesc','${_GET["quantity"]}');";
-        //     if ($pdo->query($sql) == TRUE) 
-        //     {
-        //         echo "\nPart Order, Record created successfully";
-        //     }
-        //     else
-        //     {
-        //         echo "\nPart Order, Problem Creating Record";
-        //     }
-        // }
-        // else
-        // {
-        //     echo "Order, Problem Creating Record";
-        // }
-
-        // echo "<br></br>";
-
-        // echo "<form action=\"http://students.cs.niu.edu/~z1894526/ProductSystem.php\">";
-        // echo "<input type=\"submit\" value=\"Back\" />";
-        // echo "</form>";  
     }
     catch(PDOexception $e) { // handle that exception
         echo "Connection to database failed: " . $e->getMessage();
