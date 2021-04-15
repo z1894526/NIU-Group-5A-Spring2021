@@ -26,6 +26,40 @@ try {
         }
         echo "</table>";
     }
+    function draw_table_Image($rows) {
+        echo "<head>
+        <style>
+            body {background-color: white;}
+            table {text-align: center;}
+            tr {padding-top: 10px;}
+            img { object-fit: contain}
+        </style>
+        </head>";
+        echo "<table border=1 cellspacing=1 cellpadding=1>";
+        echo "<tr>";
+    
+        foreach($rows[0] as $key => $item)
+        {
+            echo "<th>$key</th>";
+        }
+        echo "<th>Add to Cart</th>";
+        echo "</tr>";
+        foreach($rows as $row){
+            echo "<div>";
+            echo "<tr>";
+            foreach($row as $key => $item){
+                if($item == $row["pictureURL"]) {
+                    echo  "<td><img src={$item} /></td>";
+                } else {
+                    echo "<td>$item</td>";
+                }                    
+            }
+            echo '<td><input type="number" name="x'.$row['number'].'" id="x'.$row['number'].'" value="0" min="0" max="100"></td>';
+            echo"</tr>";
+            echo "</div>";
+        }
+        echo "</table>";
+    }
 
     #Add new Customer
     function AddNewCustomer($row)
@@ -64,6 +98,7 @@ try {
 
         echo"<form method=\"get\" action=\"AddPartToOrder.php\">";
         echo"<form method=\"post\">";
+        draw_table_Image($rowsParts);
         echo"<label for=\"description\">Part Description:</label>";
         echo"<select name=\"description\" id=\"description\">";
                  
