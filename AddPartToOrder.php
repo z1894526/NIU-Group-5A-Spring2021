@@ -48,6 +48,7 @@ try {
     $Legacypdo = new PDO($Legacydsn, $username = "student", $password = "student");
     $Legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+    // GET PARTS FROM LEGACY DB
     $rs = $Legacypdo->query("SELECT * FROM parts;");
     $rowsParts = $rs->fetchAll(PDO::FETCH_ASSOC);
 
@@ -73,17 +74,39 @@ try {
         }
     }
 
-    // Customer Names
+    // GET CUSTOMER FROM DB
     $rs = $pdo->query("SELECT * FROM Customer;");
     $rows = $rs->fetchAll(PDO::FETCH_ASSOC);
 
+    // SHOW DIV TOGGLE
     if(isset($_POST['showButton'])) {
         $showDiv = !$showDiv;
     }
+
+    // ADD NEW CUSTOMER FUNCTION
+    if(isset($_POST['addCustomer'])) {
+        try {
+            // Add customer to database
+            $sql = "insert into Customer (first_name, last_name, email, street__addr, city_addr, state_addr, zip_addr) values ('${_POST["first_name"]}','${_POST["last_name"]}','${_POST["email"]}','${_POST["street_addr"]}','${_POST["city_addr"]}','${_POST["state_addr"]}','${_POST["zip_addr"]}');";
+            if ($pdo->query($sql) == TRUE) 
+            {
+                echo "Customer Information Added Successfully.";
+            }
+            else
+            {
+                echo "Problem Creating Record";
+            } 
+        }
+        catch(PDOexception $e) { // handle that exception
+            echo "Connection to database failed: " . $e->getMessage();
+        }
+        $showDiv = false;
+        $rs = $pdo->query("SELECT * FROM Customer;");
+        $rows = $rs->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // ADD ORDER TO DB WITH CUSTOMER
     if(isset($_POST['continueCheckout'])) {
-        #
-        # Status needs to be Completed
-        #
         if(!empty($_POST['customer'])) {
             $thisCustomer = $_POST['customer'];
             $sql = "insert into Order_(ordered_date,customer_id,Status,weight_total,price_total) values ('$currentDateTime','$thisCustomer','Ordered','$totalWeight','$totalPrice');";
@@ -110,27 +133,7 @@ try {
         }
     }
 
-    if(isset($_POST['addCustomer'])) {
-        try {
-            // Add customer to database
-            $sql = "insert into Customer (first_name, last_name, email, street__addr, city_addr, state_addr, zip_addr) values ('${_POST["first_name"]}','${_POST["last_name"]}','${_POST["email"]}','${_POST["street_addr"]}','${_POST["city_addr"]}','${_POST["state_addr"]}','${_POST["zip_addr"]}');";
-            if ($pdo->query($sql) == TRUE) 
-            {
-                echo "Customer Information Added Successfully.";
-            }
-            else
-            {
-                echo "Problem Creating Record";
-            } 
-        }
-        catch(PDOexception $e) { // handle that exception
-            echo "Connection to database failed: " . $e->getMessage();
-        }
-        $showDiv = false;
-        $rs = $pdo->query("SELECT * FROM Customer;");
-        $rows = $rs->fetchAll(PDO::FETCH_ASSOC);
-    }
-
+    // ADD NEW CUSTOMER FORM
     if ($showDiv) {
         echo "<hr></hr>";
         echo "<h2>New Customer Form</h2>";
@@ -157,12 +160,14 @@ try {
     }
     echo "<br/>";
 
+    // ADD NEW CUSTOMER BUTTON
     if (!$showDiv) {
         echo "<form  method=\"post\">";
         echo "<input type=\"submit\" class=\"buttonStyle\" name=\"showButton\" value=\"New Customer\" />";
         echo "</form>";
     }
 
+    // CONTINUE CHECKOUT FORM
     echo "<form method=\"post\">";
     if (!$showDiv) {
         echo"<label>Existing Customer:</label><br/>";
