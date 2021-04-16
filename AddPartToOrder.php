@@ -1,7 +1,45 @@
-<html><head><title>Add Part To Order</title></head><body><pre>
+<html><head>
+<title>Group 5A Product System</title>
+<style>
+.mainStyle {
+    padding: 5px;
+    align-items: center;
+}
+input[type=text], select {
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+input[type=submit] {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+</style></head><body>
 <?php
-try {
 
+function toggleDiv(&$showDiv){
+    if($showDiv){
+        $showDiv = false;
+    } else {
+        $showDiv = true;
+    }
+}
+
+try {
     $dsn = "mysql:host=courses;dbname=z1894526";
     $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -13,13 +51,9 @@ try {
     $rs = $Legacypdo->query("SELECT * FROM parts;");
     $rowsParts = $rs->fetchAll(PDO::FETCH_ASSOC);
 
-    echo "<h2>". $_GET["customer"] . "</h2>";
-    echo "<h2>". $_GET["description"] . "</h2>";
-    echo "<h2>". $_GET["quantity"] . "</h2>";
-    echo "<h2>". $_GET["ordered_date"] . "</h2>";
+    $showDiv = false;
 
-
-    // $partId = $_GET["description"];
+    $currentDateTime = date('Y-m-d H:i:s');
     $partWeight = 0;
     $partPrice = 0;
     $totalWeight = 0;
@@ -39,40 +73,91 @@ try {
         }
     }
 
+    // Customer Names
+    $rs = $pdo->query("SELECT * FROM Customer;");
+    $rows = $rs->fetchAll(PDO::FETCH_ASSOC);
 
-    #
-    #Status needs to be Completed
-    #
-    $sql = "insert into Order_(ordered_date,customer_id,Status,weight_total,price_total) values ('${_GET["ordered_date"]}','${_GET["customer"]}','Ordered','$totalWeight','$totalPrice');";
-    if ($pdo->query($sql) == TRUE)
-    {
-        echo "Order, Record created successfully";
+    if(isset($_POST['showButton'])) {
+        $showDiv = !$showDiv;
     }
-    else
-    {
-        echo "Order, Problem Creating Record";
-    }
-
-    $orderId = $pdo->lastInsertId();
-    foreach($b as $arr) {
-        $sql = "insert into Part_Order(order_id,part_num,item_name,quantity) values ($orderId,'$arr[0]','$arr[1]','$arr[2]');";
-        if ($pdo->query($sql) == TRUE)
-        {
-            echo "\nPart Order, Record created successfully";
+    if(isset($_POST['continueCheckout'])) {
+        #
+        # Status needs to be Completed
+        #
+        $sql = "insert into Order_(ordered_date,customer_id,Status,weight_total,price_total) values ('$currentDateTime','$_POST["customer"]','Ordered','$totalWeight','$totalPrice');";
+        if ($pdo->query($sql) == TRUE) {
+            echo "Order, Record created successfully";
+        } else {
+            echo "Order, Problem Creating Record";
         }
-        else
-        {
-            echo "\nPart Order, Problem Creating Record";
+    
+        $orderId = $pdo->lastInsertId();
+        foreach($b as $arr) {
+            $sql = "insert into Part_Order(order_id,part_num,item_name,quantity) values ($orderId,'$arr[0]','$arr[1]','$arr[2]');";
+            if ($pdo->query($sql) == TRUE)
+            {
+                echo "\nPart Order, Record created successfully";
+            }
+            else
+            {
+                echo "\nPart Order, Problem Creating Record";
+            }
         }
-    }
+    } 
+    
+    if ($showDiv) {
+        echo "<hr></hr>";
+        echo "<h2>Add New Customer</h2>";
 
+        echo "<div>";
+        echo"<form method=\"get\" action=\"AddNewCustomer.php\">";
+        echo"<form method=\"post\">";
+        echo "<label>\"First Name\"</label>";
+        echo "<br></br><input type=\"text\" name=\"first_name\"/><br/>";
+        echo "<label>\"Last Name\"</label>";
+        echo "<br></br><input type=\"text\" name=\"last_name\"/><br/>";
+        echo "<label>\"Email\"</label>";
+        echo "<br></br><input type=\"text\" name=\"email\"/><br/>";
+        echo "<label>\"Street Address\"</label>";
+        echo "<br></br><input type=\"text\" name=\"street_addr\"/><br/>";
+        echo "<label>\"City\"</label>";
+        echo "<br></br><input type=\"text\" name=\"city_addr\"/><br/>";
+        echo "<label>\"State\"</label>";
+        echo "<br></br><input type=\"text\" name=\"state_addr\"/><br/>";
+        echo "<label>\"Zip\"</label>";
+        echo "<br></br><input type=\"text\" name=\"zip_addr\"/><br/>";
+
+        echo "<br></br>";
+        echo"<input type=\"submit\" name=\"button2\" value=\"Add Customer\">";
+        echo"</form>";
+        echo "</div>";
+    }
+    if (!$showDiv) {
+        echo"<label for=\"customer\">Existing Customer:</label>";
+        echo"<select name=\"customer\" id=\"Customer\">";
+        foreach($rows as $row)
+        {
+            echo "<option value=\"" . $row["customer_id"] . "\">". $row["first_name"] . " " . $row["last_name"] . "</option>";
+        }
+        echo"</select>";
+
+        echo "<form  method=\"post\">";
+        echo "<input type=\"submit\" class=\"buttonStyle\" name=\"showButton\" value=\"New Customer\" />";
+        echo "</form>";
+    }
+    echo "<br/><br/>";
+
+    echo "<form  method=\"post\">";
+    echo "<input type=\"submit\" class=\"buttonStyle\" name=\"continueCheckout\" value=\"Continue Checkout\" />";
+    echo "</form>";
+    
     echo "<br></br>";
 
-    echo "<form action=\"http://students.cs.niu.edu/~z1894526/ProductSystem.php\">";
+    echo "<form action=\"CustomerInterface.php\">";
     echo "<input type=\"submit\" value=\"Back\" />";
     echo "</form>";
 }
 catch(PDOexception $e) { // handle that exception
     echo "Connection to database failed: " . $e->getMessage();
-    }
+}
 ?>
