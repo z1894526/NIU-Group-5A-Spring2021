@@ -108,13 +108,33 @@ try {
         } else {
             echo "\nCustomer ID NOT Found.";
         }
-    } 
+    }
+
+    if(isset($_POST['addCustomer'])) {
+        try {
+            // Add customer to database
+            $sql = "insert into Customer (first_name, last_name, email, street__addr, city_addr, state_addr, zip_addr) values ('${_POST["first_name"]}','${_POST["last_name"]}','${_POST["email"]}','${_POST["street_addr"]}','${_POST["city_addr"]}','${_POST["state_addr"]}','${_POST["zip_addr"]}');";
+            if ($pdo->query($sql) == TRUE) 
+            {
+                echo "Customer Information Added Successfully.";
+            }
+            else
+            {
+                echo "Problem Creating Record";
+            } 
+        }
+        catch(PDOexception $e) { // handle that exception
+            echo "Connection to database failed: " . $e->getMessage();
+        }
+        $showDiv = false;
+        $rs = $pdo->query("SELECT * FROM Customer;");
+        $rows = $rs->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     if ($showDiv) {
         echo "<hr></hr>";
         echo "<h2>New Customer Form</h2>";
 
-        echo"<form method=\"get\" action=\"AddNewCustomer.php\">";
         echo"<form method=\"post\">";
         echo "<label>\"First Name\"</label><br/>";
         echo "<input type=\"text\" name=\"first_name\"/><br/><br/>";
@@ -132,7 +152,7 @@ try {
         echo "<input type=\"text\" name=\"zip_addr\"/><br/>";
 
         echo "<br></br>";
-        echo"<input type=\"submit\" name=\"button2\" value=\"Add Customer\">";
+        echo"<input type=\"submit\" name=\"addCustomer\" value=\"Add Customer\">";
         echo"</form>";
     }
     echo "<br/>";
