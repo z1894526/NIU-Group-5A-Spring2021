@@ -1,6 +1,10 @@
 <html><head><title>Group 5A Product System</title></head><body><pre>
 <?php
 
+// PLACEHOLDER FOR OLD PRODUCTSYSTEM.PHP
+// PLACEHOLDER FOR OLD PRODUCTSYSTEM.PHP
+// PLACEHOLDER FOR OLD PRODUCTSYSTEM.PHP
+
 function draw_table_Image($rows) {
     echo "<head>
     <style>

@@ -1,7 +1,7 @@
 <html><head>
 <title>Group 5A Product System</title>
 <style>
-.buttonStyle {
+input[type=submit] {
     background-color: #4CAF50;
     border: none;
     color: white;
@@ -12,6 +12,9 @@
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
+}
+input[type=submit]:hover {
+  background-color: #45a049;
 }
 .mainStyle {
     padding: 20px;

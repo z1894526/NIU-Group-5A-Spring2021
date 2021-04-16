@@ -6,7 +6,7 @@
     align-items: center;
 }
 input[type=text], select {
-    padding: 12px 20px;
+    padding: 12px 4px;
     margin: 8px 0;
     display: inline-block;
     border: 1px solid #ccc;
@@ -84,70 +84,76 @@ try {
         #
         # Status needs to be Completed
         #
-        $sql = "insert into Order_(ordered_date,customer_id,Status,weight_total,price_total) values ('$currentDateTime','$_POST["customer"]','Ordered','$totalWeight','$totalPrice');";
-        if ($pdo->query($sql) == TRUE) {
-            echo "Order, Record created successfully";
+        if(!empty($_POST['customer'])) {
+            $thisCustomer = $_POST['customer'];
+            $sql = "insert into Order_(ordered_date,customer_id,Status,weight_total,price_total) values ('$currentDateTime','$thisCustomer','Ordered','$totalWeight','$totalPrice');";
+            if ($pdo->query($sql) == TRUE) {
+                echo "Order, Record created successfully";
+            } else {
+                echo "Order, Problem Creating Record";
+            }
+        
+            $orderId = $pdo->lastInsertId();
+            foreach($b as $arr) {
+                $sql = "insert into Part_Order(order_id,part_num,item_name,quantity) values ($orderId,'$arr[0]','$arr[1]','$arr[2]');";
+                if ($pdo->query($sql) == TRUE)
+                {
+                    echo "\nPart Order, Record created successfully";
+                }
+                else
+                {
+                    echo "\nPart Order, Problem Creating Record";
+                }
+            }
         } else {
-            echo "Order, Problem Creating Record";
-        }
-    
-        $orderId = $pdo->lastInsertId();
-        foreach($b as $arr) {
-            $sql = "insert into Part_Order(order_id,part_num,item_name,quantity) values ($orderId,'$arr[0]','$arr[1]','$arr[2]');";
-            if ($pdo->query($sql) == TRUE)
-            {
-                echo "\nPart Order, Record created successfully";
-            }
-            else
-            {
-                echo "\nPart Order, Problem Creating Record";
-            }
+            echo "\nCustomer ID NOT Found.";
         }
     } 
-    
+
     if ($showDiv) {
         echo "<hr></hr>";
-        echo "<h2>Add New Customer</h2>";
+        echo "<h2>New Customer Form</h2>";
 
-        echo "<div>";
         echo"<form method=\"get\" action=\"AddNewCustomer.php\">";
         echo"<form method=\"post\">";
-        echo "<label>\"First Name\"</label>";
-        echo "<br></br><input type=\"text\" name=\"first_name\"/><br/>";
-        echo "<label>\"Last Name\"</label>";
-        echo "<br></br><input type=\"text\" name=\"last_name\"/><br/>";
-        echo "<label>\"Email\"</label>";
-        echo "<br></br><input type=\"text\" name=\"email\"/><br/>";
-        echo "<label>\"Street Address\"</label>";
-        echo "<br></br><input type=\"text\" name=\"street_addr\"/><br/>";
-        echo "<label>\"City\"</label>";
-        echo "<br></br><input type=\"text\" name=\"city_addr\"/><br/>";
-        echo "<label>\"State\"</label>";
-        echo "<br></br><input type=\"text\" name=\"state_addr\"/><br/>";
-        echo "<label>\"Zip\"</label>";
-        echo "<br></br><input type=\"text\" name=\"zip_addr\"/><br/>";
+        echo "<label>\"First Name\"</label><br/>";
+        echo "<input type=\"text\" name=\"first_name\"/><br/><br/>";
+        echo "<label>\"Last Name\"</label><br/>";
+        echo "<input type=\"text\" name=\"last_name\"/><br/><br/>";
+        echo "<label>\"Email\"</label><br/>";
+        echo "<input type=\"text\" name=\"email\"/><br/><br/>";
+        echo "<label>\"Street Address\"</label><br/>";
+        echo "<input type=\"text\" name=\"street_addr\"/><br/><br/>";
+        echo "<label>\"City\"</label><br/>";
+        echo "<input type=\"text\" name=\"city_addr\"/><br/><br/>";
+        echo "<label>\"State\"</label><br/>";
+        echo "<input type=\"text\" name=\"state_addr\"/><br/><br/>";
+        echo "<label>\"Zip\"</label><br/>";
+        echo "<input type=\"text\" name=\"zip_addr\"/><br/>";
 
         echo "<br></br>";
         echo"<input type=\"submit\" name=\"button2\" value=\"Add Customer\">";
         echo"</form>";
-        echo "</div>";
     }
+    echo "<br/>";
+
     if (!$showDiv) {
-        echo"<label for=\"customer\">Existing Customer:</label>";
+        echo "<form  method=\"post\">";
+        echo "<input type=\"submit\" class=\"buttonStyle\" name=\"showButton\" value=\"New Customer\" />";
+        echo "</form>";
+    }
+
+    echo "<form method=\"post\">";
+    if (!$showDiv) {
+        echo"<label>Existing Customer:</label><br/>";
         echo"<select name=\"customer\" id=\"Customer\">";
         foreach($rows as $row)
         {
             echo "<option value=\"" . $row["customer_id"] . "\">". $row["first_name"] . " " . $row["last_name"] . "</option>";
         }
         echo"</select>";
-
-        echo "<form  method=\"post\">";
-        echo "<input type=\"submit\" class=\"buttonStyle\" name=\"showButton\" value=\"New Customer\" />";
-        echo "</form>";
     }
     echo "<br/><br/>";
-
-    echo "<form  method=\"post\">";
     echo "<input type=\"submit\" class=\"buttonStyle\" name=\"continueCheckout\" value=\"Continue Checkout\" />";
     echo "</form>";
     
