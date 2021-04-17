@@ -73,8 +73,14 @@ h2 {
         <input type="submit" class="buttonStyle" value="Warehouse"/>
     </form>
 
-    <form class="smallerButton" method="POST" action="AdminConsoleInterface.php">
+    <form class="smallerButton" method="POST" action="Admin.php">
         <input type="submit" class="buttonStyle" value="Admin Console"/>
+    </form>
+
+    <!-- REMOVE BEFORE PRESENTATION -->
+    </br>
+    <form class="smallerButton" method="POST" action="DeveloperView.php">
+        <input type="submit" class="buttonStyle" value="Developer ONLY Console"/>
     </form>
 
 </body>

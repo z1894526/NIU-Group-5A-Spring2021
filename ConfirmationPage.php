@@ -44,10 +44,9 @@ label {
 div {
    max-width: 600px;
    text-align: center;
-   align-items: center;
 }
 .leftAlign {
-	text-align: left;
+	text-align: left !important;
 }
 .container {
     max-width: 500px;
@@ -69,67 +68,63 @@ h2 {
 <body><?php
 $transId = $_GET["trans_id"];
 $orderId = $_GET["order_id"];
+
 try {
-   $dsn = "mysql:host=courses;dbname=z1894526";
-   $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
-   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $dsn = "mysql:host=courses;dbname=z1894526";
+    $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-   $Legacydsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
-   $Legacypdo = new PDO($Legacydsn, $username = "student", $password = "student");
-   $Legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $Legacydsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
+    $Legacypdo = new PDO($Legacydsn, $username = "student", $password = "student");
+    $Legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-   // GET ORDER INFO
-   $rs = $pdo->query("SELECT * FROM Order_ where order_id=$orderId;");
-   $order = $rs->fetchAll(PDO::FETCH_ASSOC);
+    // GET ORDER INFO
+    $rs = $pdo->query("SELECT * FROM Order_ WHERE order_id=$orderId;");
+    $orderArr = $rs->fetchAll(PDO::FETCH_ASSOC);
+    $order = $orderArr[0];
+    $customerId = $order["customer_id"];
+    $orderedDate = $order["ordered_date"];
+    $status = $order["status"];
+    $totalWeight = $order["weight_total"];
+    $totalPrice = $order["price_total"];
 
-   $customerId = $order["customer_id"];
-   $orderedDate = $order["ordered_date"];
-   $status = $order["status"];
-   $totalWeight = $order["weight_total"];
-   $totalPrice = $order["price_total"];
+    //GET CUSTOMER INFO
+    $rs = $pdo->query("SELECT * FROM Customer WHERE customer_id=$customerId;");
+    $customerArr = $rs->fetchAll(PDO::FETCH_ASSOC);
+    $customer = $customerArr[0];
+    $fName = $customer["first_name"];
+    $lName = $customer["last_name"];
+    $email = $customer["email"];
+    $street = $customer["street__addr"];
+    $city = $customer["city_addr"];
+    $state = $customer["state_addr"];
+    $zip = $customer["zip_addr"];
 
-   // GET CUSTOMER INFO
-   $rs = $pdo->query("SELECT * FROM Customer where customer_id=$customerId;");
-   $customer = $rs->fetchAll(PDO::FETCH_ASSOC);
+    // CONFIRMATION MSG
+    $msg = 'ORDER ID: '.$orderId.' ORDERD ON: '.$orderedDate.'\n';
+    $msg .= 'TOTAL PRICE: '.$totalPrice.'    |   STATUS: '.$status.'\n';
+    $msg .= 'ORDER WEIGHT: '.$totalWeight.' SHIPPED TO '.$fName.' '.$lName.'\n';
+    $msg .= 'DELIVERY ADDRESS: '.$street.''.$city .', '. $state ." ".$zip.'\n';
 
-   $fName = $customer["first_name"];
-   $lName = $customer["last_name"];
-   $email = $customer["email"];
-   $street = $customer["street__addr"];
-   $city = $customer["city_addr"];
-   $state = $customer["state_addr"];
-   $zip = $customer["zip_addr"];
+    $msg = wordwrap($msg,250);
+    $msgSub = "Order Purchased: ".$orderId;
+    $headers = "From: GROUP5A@NIU";
+    mail("s.r.haut@gmail.com",$msgSub,$msg, $headers);
 
-//    // GET PART ORDER INFO: Part_Order
+    $msg .= 'EMAIL SENT TO: '.$email;
 
-
+    // CONFIRMATION PANEL
+    ?>
+    <div class="container">
+    <h2>Purchase Confirmed</h2>  
+    <div class="leftAligned">
+    <label><?php echo $msg; ?></label>
+    </div>
+    </div>  
+    <?php
 }
 catch(PDOexception $e) { // handle that exception
     echo "Connection to database failed: " . $e->getMessage();
 }
-?>
-<div class="container">
-<h2>New Customer Form</h2> 
-<form class="leftAlign" method="post"> 
-    <label>First Name</label><br/> 
-    <input type="text" placeholder="first name..." name="first_name"/><br/><br/> 
-    <label>Last Name</label><br/> 
-    <input type="text" placeholder="last name..." name="last_name"/><br/><br/> 
-    <label>Email</label><br/> 
-    <input type="text" placeholder="email..." name="email"/><br/><br/> 
-    <label>Street Address</label><br/> 
-    <input type="text" placeholder="street address..." name="street_addr"/><br/><br/> 
-    <label>City</label><br/> 
-    <input type="text" placeholder="city..." name="city_addr"/><br/><br/> 
-    <label>State</label><br/> 
-    <input type="text" placeholder="state..." name="state_addr"/><br/><br/> 
-    <label>Zip</label><br/> 
-    <input type="text" placeholder="zip..." name="zip_addr"/><br/> 
-    <br/> 
-    <input type="submit" name="addCustomer" value="Add Customer"> 
-</form>
-</div>  
-<?php
-
 ?></body>
 </html>

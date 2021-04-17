@@ -70,25 +70,50 @@ h2 {
 
 <?php
 $totalPrice = $_GET["total_price"];
+$totalWeight = $_GET["total_weight"];
 $orderId = $_GET["order_id"];
+$shippingPrice = 0;
+$pdo;
+$dsn = "mysql:host=courses;dbname=z1894526";
+try {
+    $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    $rs = $pdo->query("SELECT * FROM Shipping_Cost;");
+    $shippingCostArray = $rs->fetchAll(PDO::FETCH_ASSOC);
+
+    foreach($shippingCostArray as $shippingCost) {
+        if($totalWeight < $shippingCost["max_weight"] && $totalWeight > $shippingCost["min_weight"]){
+            $shippingPrice = $shippingCost["price"];
+            break;
+        }
+    }
+} catch(PDOexception $e) { // handle that exception
+    echo "Connection to database failed: " . $e->getMessage();
+}
+
+$formatTotalPrice = money_format("$%i", $totalPrice);
+$formatShippingPrice = money_format("$%i", $shippingPrice);
+$calculatedTotalAmount = money_format("$%i", ($totalPrice + $shippingPrice));
+
 ?>
 
 <div class="container">
 <hr></hr>
 <h2>Add Credit Card</h2>
 <form class="leftAlign" method="post">
-<!-- 6011 1234 4321 1234 -->
-<!-- Text boxes to add values from user input for their Workouts -->
 <label>Name on Card</label><br/> 
 <input type="text" placeholder="Name on card..." name="Name"/><br/><br/> 
 <label>Credit Card transIdber</label><br/> 
 <input type="text" placeholder="Credit Card..." name="cc" value="6011 1234 4321 1234"/><br/><br/>   <!-- DELETE VALUE AFTER TESTING -->
 <label>Expiration Date (MM/YYYY)</label><br/> 
 <input type="text" placeholder="Expiration date..." name="exp" value="08/2022"/><br/><br/>          <!-- DELETE VALUE AFTER TESTING -->
-<label>Amount</label><br/> 
-<input type="text" placeholder="Amount..." name="amount" readonly="readonly" value="<?= $totalPrice ?>"/><br/><br/> 
+<br/><br/> 
+<label style="font-size: 16px;"><?php echo "Order Amount: ".$formatTotalPrice ?></label><br/> 
+<label style="font-size: 16px;"><?php echo "Shipping Amount: ".$formatShippingPrice ?></label><br/>
+<br/>
+<label style="font-size: 16px;"><?php echo "Total Amount: ".$calculatedTotalAmount ?></label><br/> 
 
-<!-- Button to add vaules inserted into Workout -->
 <br></br>
 <input type="submit" name="AddCC" value="Submit Credit Card">
 </form>
@@ -96,15 +121,8 @@ $orderId = $_GET["order_id"];
 
 <?php
 if(isset($_POST['AddCC'])) {
+    $totalPrice = $totalPrice + $shippingPrice;
     try {
-        $dsn = "mysql:host=courses;dbname=z1894526";
-        $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        $Legacydsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
-        $Legacypdo = new PDO($Legacydsn, $username = "student", $password = "student");
-        $Legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
         $url = 'http://blitz.cs.niu.edu/CreditCard/';
         $transId = rand(100,999) . '-' . rand(100000000,999999999) . '-' . rand(100,999);
         $data = array(
@@ -113,7 +131,7 @@ if(isset($_POST['AddCC'])) {
             'cc' => $_POST["cc"],
             'name' => $_POST["Name"], 
             'exp' => $_POST["exp"], 
-            'amount' => $_POST["amount"]);
+            'amount' => $totalPrice);
 
         $options = array(
             'http' => array(
@@ -127,7 +145,7 @@ if(isset($_POST['AddCC'])) {
         $result = file_get_contents($url, false, $context);
         $obj = json_decode($result);
         if($obj->authorization) { // Authorized
-            $sql = "UPDATE Order_ SET status='Purchased' WHERE order_id=$orderId;";
+            $sql = "UPDATE Order_ SET `status`='Purchased', `price_total`='$totalPrice'  WHERE order_id=$orderId;";
             if (!$pdo->query($sql)) {
                 echo "\nOrder, Problem Creating Record";
             }

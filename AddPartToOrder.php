@@ -149,12 +149,11 @@ try {
         $orderId = $pdo->lastInsertId();
         foreach($b as $arr) {
             $sql = "insert into Part_Order(order_id,part_num,item_name,quantity) values ($orderId,'$arr[0]','$arr[1]','$arr[2]');";
-            if (!$pdo->query($sql))
-            {
+            if (!$pdo->query($sql)) {
                 echo "\nPart Order, Problem Creating Record";
             }
         }
-        header("Location: AddCreditCard.php?total_price=$totalPrice&order_id=$orderId");
+        header("Location: AddCreditCard.php?total_price=$totalPrice&total_weight=$totalWeight&order_id=$orderId");
         exit();
       } else {
          echo "\nCustomer ID NOT Found.";
