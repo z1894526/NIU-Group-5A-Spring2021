@@ -100,25 +100,17 @@ try {
     $state = $customer["state_addr"];
     $zip = $customer["zip_addr"];
 
-    // CONFIRMATION MSG
-    $msg = 'ORDER ID: '.$orderId.' ORDERD ON: '.$orderedDate.'\n';
-    $msg .= 'TOTAL PRICE: '.$totalPrice.'    |   STATUS: '.$status.'\n';
-    $msg .= 'ORDER WEIGHT: '.$totalWeight.' SHIPPED TO '.$fName.' '.$lName.'\n';
-    $msg .= 'DELIVERY ADDRESS: '.$street.''.$city .', '. $state ." ".$zip.'\n';
-
-    $msg = wordwrap($msg,250);
-    $msgSub = "Order Purchased: ".$orderId;
-    $headers = "From: GROUP5A@NIU";
-    mail("s.r.haut@gmail.com",$msgSub,$msg, $headers);
-
-    $msg .= 'EMAIL SENT TO: '.$email;
+    // $msg .= 'EMAIL SENT TO: '.$email;
 
     // CONFIRMATION PANEL
     ?>
     <div class="container">
     <h2>Purchase Confirmed</h2>  
     <div class="leftAligned">
-    <label><?php echo $msg; ?></label>
+    <label style="font-size: 16px;"><?php echo 'ORDER ID: '.$orderId.' ORDERD ON: '.$orderedDate; ?></label><br/> 
+    <label style="font-size: 16px;"><?php echo 'TOTAL PRICE: '.$totalPrice.'    |   STATUS: '.$status; ?></label><br/> 
+    <label style="font-size: 16px;"><?php echo 'ORDER WEIGHT: '.$totalWeight.' SHIPPED TO '.$fName.' '.$lName; ?></label><br/> 
+    <label style="font-size: 16px;"><?php echo 'DELIVERY ADDRESS: '.$street.' '.$city.', '.$state.' '.$zip; ?></label><br/> 
     </div>
     </div>  
     <?php
