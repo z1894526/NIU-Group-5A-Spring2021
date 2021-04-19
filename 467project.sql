@@ -31,7 +31,7 @@ CREATE TABLE Order_
 	filled_date DATETIME,
 	ordered_date DATETIME,
 	status VARCHAR(10),
-	weight_total FLOAT(4,2),
+	weight_total FLOAT(6,2),
 	price_total FLOAT(8,2),
 
 	PRIMARY KEY	(order_id),
@@ -57,11 +57,12 @@ CREATE TABLE Part_Order
 #Shipping_Cost(price^, order_id*, min_weight^, max_weight^)
 CREATE TABLE Shipping_Cost
 (
+	bracket_id INT NOT NULL AUTO_INCREMENT,
 	price FLOAT(8,2) NOT NULL,
 	min_weight FLOAT(4,2) NOT NULL,
 	max_weight FLOAT(4,2) NOT NULL,
 
-	PRIMARY KEY	(min_weight)
+	PRIMARY KEY	(bracket_id)
 );
 
 DESCRIBE Customer;
