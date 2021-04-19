@@ -59,8 +59,8 @@ CREATE TABLE Shipping_Cost
 (
 	bracket_id INT NOT NULL AUTO_INCREMENT,
 	price FLOAT(8,2) NOT NULL,
-	min_weight FLOAT(4,2) NOT NULL,
-	max_weight FLOAT(4,2) NOT NULL,
+	min_weight FLOAT(6,2) NOT NULL,
+	max_weight FLOAT(6,2) NOT NULL,
 
 	PRIMARY KEY	(bracket_id)
 );
