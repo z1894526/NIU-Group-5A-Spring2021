@@ -1,120 +1,60 @@
 <!DOCTYPE HTML>
 <html>
-<style>
-* {
-    font-family: 'Open Sans Condensed', sans-serif;
-    text-transform: uppercase;
-}
-body {
-   background-color: hsl(79, 75%, 87%, 0.5);
-}
-.mainStyle {
-    padding: 5px;
-    align-items: center;
-}
-input[type=text], select {
-	border: 2px solid #4D4D4D;
-    width: 100%;
-    padding: 12px 4px;
-    margin: 6px 0;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-input[type=submit] {
-    width: 100%;
-    background-color: #4CAF50;
-    border: 1px solid #4D4D4D;
-    color: white;
-    padding: 8px 16px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-weight: bold;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-}
-input[type=submit]:hover {
-    background-color: #45a049;
-}
-label {
-    font-size: large;
-    font-weight: bold;
-}
-div {
-   max-width: 600px;
-   text-align: center;
-   align-items: center;
-}
-.leftAlign {
-	text-align: left;
-}
-.container {
-    max-width: 500px;
-    border-radius: 5px;
-    background-color: rgba(42, 91, 139, 0.5);
-    border: 4px solid #4D4D4D;
-    padding: 40px;
-    padding-top: 20px;
-}
-h2 {
-	font-size: 25px;
-    text-align: center;
-    font-weight: bold;
-}
-.smallerButton {
-	max-width: 500px;
-}
-</style>
-<body><?php
-
+<title>Group 5A: Add Parts To Order</title>
+<body>
+<?php
+session_start();
+include 'NavHeader.php';
 // Variables
 $showDiv = false;
 
 try {
-   $dsn = "mysql:host=courses;dbname=z1894526";
-   $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
-   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$dsn = "mysql:host=courses;dbname=z1894526";
+$pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-   $Legacydsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
-   $Legacypdo = new PDO($Legacydsn, $username = "student", $password = "student");
-   $Legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$Legacydsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
+$Legacypdo = new PDO($Legacydsn, $username = "student", $password = "student");
+$Legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-   //GET PARTS FROM LEGACY DB
-   $rs = $Legacypdo->query("SELECT * FROM parts;");
-   $rowsParts = $rs->fetchAll(PDO::FETCH_ASSOC);
-   $currentDateTime = date('Y-m-d H:i:s');
-   $partWeight = 0;
-   $partPrice = 0;
-   $totalWeight = 0;
-   $totalPrice = 0;
-   $b = [];
-   foreach($rowsParts as $rowPart) {
-       $x = $rowPart["number"];
-       $qty = $_GET["x".$x];
-       if ($qty > 0) {
-           $partDesc = $rowPart["description"];
-           $partWeight = $rowPart["weight"] * $qty;
-           $partPrice = $rowPart["price"] * $qty;
-           $totalWeight = $totalWeight + $partWeight;
-           $totalPrice = $totalPrice + $partPrice;
-           $a = [$x, $partDesc, $qty];
-           array_push($b, $a);
-       }
-   }
+//GET PARTS FROM LEGACY DB
+$rs = $Legacypdo->query("SELECT * FROM parts;");
+$rowsParts = $rs->fetchAll(PDO::FETCH_ASSOC);
+$currentDateTime = date('Y-m-d H:i:s');
+$partWeight = 0;
+$partPrice = 0;
+$totalWeight = 0;
+$totalPrice = 0;
+$b = [];
+if (isset($_SESSION['cart'])) {
+    foreach($rowsParts as $rowPart) {
+        $itemId = $rowPart["number"];
+        if (isset($_SESSION['cart'][$itemId])) {
+            $qty = $_SESSION['cart'][$itemId];
+            if ($qty > 0) {
+                $partDesc = $rowPart["description"];
+                $partWeight = $rowPart["weight"] * $qty;
+                $partPrice = $rowPart["price"] * $qty;
+                $totalWeight = $totalWeight + $partWeight;
+                $totalPrice = $totalPrice + $partPrice;
+                $a = [$itemId, $partDesc, $qty];
+                array_push($b, $a);
+            }
+        }
+    }
+}
 
    // GET CUSTOMER FROM DB
    $rs = $pdo->query("SELECT * FROM Customer;");
    $rows = $rs->fetchAll(PDO::FETCH_ASSOC);
 
    // SHOW DIV TOGGLE
-   if(isset($_POST['showButton'])) {
-      if ($showDiv) {
-         $showDiv = false;
-      } else {
-         $showDiv = true;
-      }
-   }
+    if(isset($_POST['showButton'])) {
+        $showDiv = true;
+    }
+    if(isset($_POST['hideButton'])) {
+        $showDiv = false;
+    }
 
    // ADD NEW CUSTOMER FUNCTION
    if(isset($_POST['addCustomer'])) {
@@ -153,48 +93,56 @@ try {
                 echo "\nPart Order, Problem Creating Record";
             }
         }
-        header("Location: AddCreditCard.php?total_price=$totalPrice&total_weight=$totalWeight&order_id=$orderId");
-        exit();
+        ?>
+        <script>window.location="AddCreditCard.php?total_price=<?php echo $totalPrice ?>&total_weight=<?php echo $totalWeight ?>&order_id=<?php echo $orderId ?>"</script>
+        <?php
       } else {
          echo "\nCustomer ID NOT Found.";
       }
    }
-   echo "<div>";
+   echo "<div class=\"cropDiv\">";
    // ADD NEW CUSTOMER FORM
+   ?><div class="container"><?php
    if ($showDiv) {
       ?>
+      <form  method= "post" >
+         <input class="inputSubmit" type="submit" name="hideButton" value="Existing Customer? Click here."/>
+      </form >
       <div class="container">
       <h2>New Customer Form</h2> 
-      <form class="leftAlign" method="post"> 
+      <form style="text-align: left;" method="post"> 
          <label>First Name</label><br/> 
-         <input type="text" placeholder="first name..." name="first_name"/><br/><br/> 
+         <input type="text" class="inputTextSelect" placeholder="first name..." name="first_name"/><br/><br/> 
          <label>Last Name</label><br/> 
-         <input type="text" placeholder="last name..." name="last_name"/><br/><br/> 
+         <input type="text" class="inputTextSelect" placeholder="last name..." name="last_name"/><br/><br/> 
          <label>Email</label><br/> 
-         <input type="text" placeholder="email..." name="email"/><br/><br/> 
+         <input type="text" class="inputTextSelect" placeholder="email..." name="email"/><br/><br/> 
          <label>Street Address</label><br/> 
-         <input type="text" placeholder="street address..." name="street_addr"/><br/><br/> 
+         <input type="text" class="inputTextSelect" placeholder="street address..." name="street_addr"/><br/><br/> 
          <label>City</label><br/> 
-         <input type="text" placeholder="city..." name="city_addr"/><br/><br/> 
+         <input type="text" class="inputTextSelect" placeholder="city..." name="city_addr"/><br/><br/> 
          <label>State</label><br/> 
-         <input type="text" placeholder="state..." name="state_addr"/><br/><br/> 
+         <input type="text" class="inputTextSelect" placeholder="state..." name="state_addr"/><br/><br/> 
          <label>Zip</label><br/> 
-         <input type="text" placeholder="zip..." name="zip_addr"/><br/> 
+         <input type="text" class="inputTextSelect" placeholder="zip..." name="zip_addr"/><br/> 
          <br/> 
-         <input type="submit" name="addCustomer" value="Add Customer"> 
+         <input type="submit" class="inputSubmit" name="addCustomer" value="Add Customer"> 
       </form>
       </div>  
       <?php
    } else {
    ?>
+   
       <form  method= "post" >
-         <input class="smallerButton" type="submit" name="showButton" value="New Customer? Lets set you up."/>
+         <input class="inputSubmit" type="submit" name="showButton" value="New Customer? Lets set you up."/>
       </form >
       <br/>
       <!-- CONTINUE CHECKOUT FORM -->
-      <div class="container"><form method="post">
-         <label>Existing Customer:</label><br/>
-         <select name="customer" id="Customer">
+      
+      <form method="post">
+         <label>Existing Customer: Select your name</label><br/>
+         <select class="inputTextSelect" name="customer" id="Customer">
+         <option value=""></option>
          <?php
          foreach($rows as $row) { 
             echo "<option value=\"" . $row["customer_id"] . "\">". $row["first_name"] . " " . $row["last_name"] . "</option>";
@@ -204,16 +152,17 @@ try {
 
          <!-- Checkout Button -->
          <br/><br/>
-         <input type="submit" class="buttonStyle" name="continueCheckout" value="Continue Checkout" />
-      </form></div>
+         <input type="submit" class="inputSubmit" name="continueCheckout" value="Continue Checkout" />
+      </form>
    <?php
    }
 
    // Back Button
    ?><br/>
    <form  action="CustomerInterface.php">
-      <input class="smallerButton" type="submit" value="Back" />
+      <input class="back" type="submit" value="Back" />
    </form >
+   </div>
    </div>
    <?php
 }

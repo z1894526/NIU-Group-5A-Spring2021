@@ -1,96 +1,74 @@
-<html><head>
-<title>Group 5A Product System</title>
-<style>
-input[type=submit] {
-    background-color: #4CAF50;
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-}
-input[type=submit]:hover {
-  background-color: #45a049;
-}
-.mainStyle {
-    padding: 20px;
-    align-items: center;
-}
-</style></head><body>
+<!DOCTYPE HTML>
+<html>
+<title>Group 5A: Online Shopping</title>
+</head><body>
 <?php
+session_start();
+include 'NavHeader.php';
 
-function draw_table_Image($rows) {
-    echo "<head>
-    <style>
-        body {background-color: white;}
-        table {text-align: center;}
-        tr {padding-top: 10px;}
-        img { object-fit: contain}
-    </style>
-    </head>";
-    echo "<table border=1 cellspacing=1 cellpadding=1>";
-    echo "<tr>";
-
-    foreach($rows[0] as $key => $item)
-    {
-        echo "<th>$key</th>";
+if (isset($_POST['update'])) {
+	$quantity = (int)$_POST['quantity'];
+	$productId = (int)$_POST['productId'];
+    if($_POST['update'] == '+') {
+        $quantity++;
+    } else if($_POST['update'] == '-') {
+        $quantity--;
+		if($quantity < 0) $quantity = 0;
     }
-    echo "<th>Add to Cart</th>";
-    echo "</tr>";
+    if (isset($_SESSION['cart'])) {
+        $_SESSION['cart'][$productId] = $quantity;
+    } else {
+        $_SESSION['cart'] = array($productId => $quantity);
+    }
+}
+
+function draw_table_Image($rows) { 
+    ?>
+    <div class="grid-container" id="customers">
+    <?php
     foreach($rows as $row){
-        echo "<div>";
-        echo "<tr>";
-        foreach($row as $key => $item){
-            if($item == $row["pictureURL"]) {
-                echo  "<td><img style=\"width:50px;height:50px;\" src={$item} /></td>";
-            } else {
-                echo "<td>$item</td>";
-            }                    
-        }
-        echo '<td><input type="number" name="x'.$row['number'].'" id="x'.$row['number'].'" value="0" min="0" max="100"></td>';
-        echo"</tr>";
-        echo "</div>";
+        ?>
+        <div class="grid-item"><tr><td>
+        <form method="post"> 
+        <input type="hidden" name="productId" value="<?php echo $row['number'];?>" />
+        <div class="container">
+        <img width="120" height="100" src="<?php echo $row['pictureURL'] ?>" />
+        <p><?php echo $row['description']."<br/>".
+        "Part Number: ".$row['number']."<br/>".
+        "Amount: $".$row['price']."<br/>".
+        "Weight: ".$row['weight']." lbs";?></p>
+         <div>
+            <input type="submit" value="-" name="update" class="minus">
+            <input type="number" name='quantity' id='quantity' step="1" min="0" max="" class="qty" value="<?php echo (isset($_SESSION["cart"][$row['number']]))?$_SESSION["cart"][$row['number']]:'0';?>" size="16" inputmode="">
+            <input type="submit" value="+" name="update" class="plus">
+        </div>
+        </div>
+        </form>
+        </td></tr></div><?php
     }
-    echo "</table>";
+    ?></div><?php
 }
 
 try {
-    # Call to Maria database to get relevant tables
-    $dsn = "mysql:host=courses;dbname=z1894526";
-    $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-    # Get Customers Info
-    $rs = $pdo->query("SELECT * FROM Customer;");
-    $rows = $rs->fetchAll(PDO::FETCH_ASSOC);
-
-    // Add Parts
     $Legacydsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
     $Legacypdo = new PDO($Legacydsn, $username = "student", $password = "student");
-    $Legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);    
-
+    $Legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);   
+     
     $rs = $Legacypdo->query("SELECT * FROM parts;");
     $rowsParts = $rs->fetchAll(PDO::FETCH_ASSOC);
+    
+    ?>
+    <div>
+    
+    <form method="get" action="AddPartToOrder.php">
+    <form method="post">
+    <div class="footer">
+        <input type="submit" class="inputSubmit" value="Checkout Order">
+    </div>
+    </form>
 
-    echo "<div class=\"mainStyle\">";
-    echo "<hr></hr>";
-    echo "<h2>Add Part to order</h2>";
-
-    echo"<form method=\"get\" action=\"AddPartToOrder.php\">";
-    echo"<form method=\"post\">";
-    draw_table_Image($rowsParts);
-    echo "</br/>";
-
-    # Button to add vaules inserted into MySql
-    echo "<br></br>";
-    echo"<input type=\"submit\" class=\"buttonStyle\" name=\"button2\" value=\"Checkout Order\">";
-    echo"</form>";
-    echo "<br/><br/>";
-    echo "</div>";
+    <?php draw_table_Image($rowsParts) ?>
+    </div><?php
 }
 catch(PDOexception $e) { // handle that exception
     echo "Connection to database failed: " . $e->getMessage();

@@ -1,71 +1,8 @@
 <!DOCTYPE HTML>
 <html>
-<style>
-* {
-    font-family: 'Open Sans Condensed', sans-serif;
-    text-transform: uppercase;
-}
-body {
-   background-color: hsl(79, 75%, 87%, 0.5);
-}
-.mainStyle {
-    padding: 5px;
-    align-items: center;
-}
-input[type=text], select {
-	border: 2px solid #4D4D4D;
-    width: 100%;
-    padding: 12px 4px;
-    margin: 6px 0;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
-input[type=submit] {
-    width: 100%;
-    background-color: #4CAF50;
-    border: 1px solid #4D4D4D;
-    color: white;
-    padding: 8px 16px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-weight: bold;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-}
-input[type=submit]:hover {
-    background-color: #45a049;
-}
-label {
-    font-size: large;
-    font-weight: bold;
-}
-div {
-   max-width: 600px;
-   text-align: center;
-}
-.leftAlign {
-	text-align: left !important;
-}
-.container {
-    max-width: 500px;
-    border-radius: 5px;
-    background-color: rgba(42, 91, 139, 0.5);
-    border: 4px solid #4D4D4D;
-    padding: 40px;
-    padding-top: 20px;
-}
-h2 {
-	font-size: 25px;
-    text-align: center;
-    font-weight: bold;
-}
-.smallerButton {
-	max-width: 500px;
-}
-</style>
+<title>Group 5A: Confirmation Page</title>
 <body><?php
+include 'NavHeader.php';
 $transId = $_GET["trans_id"];
 $orderId = $_GET["order_id"];
 
@@ -108,8 +45,8 @@ try {
     <h2>Purchase Confirmed</h2>  
     <div class="leftAligned">
     <label style="font-size: 16px;"><?php echo 'ORDER ID: '.$orderId.' ORDERD ON: '.$orderedDate; ?></label><br/> 
-    <label style="font-size: 16px;"><?php echo 'TOTAL PRICE: '.$totalPrice.'    |   STATUS: '.$status; ?></label><br/> 
-    <label style="font-size: 16px;"><?php echo 'ORDER WEIGHT: '.$totalWeight.' SHIPPED TO '.$fName.' '.$lName; ?></label><br/> 
+    <label style="font-size: 16px;"><?php echo 'TOTAL PRICE: $'.$totalPrice.'    |   STATUS: '.$status; ?></label><br/> 
+    <label style="font-size: 16px;"><?php echo 'ORDER WEIGHT: '.$totalWeight.'lbs SHIPPED TO '.$fName.' '.$lName; ?></label><br/> 
     <label style="font-size: 16px;"><?php echo 'DELIVERY ADDRESS: '.$street.' '.$city.', '.$state.' '.$zip; ?></label><br/> 
     </div>
     </div>  
