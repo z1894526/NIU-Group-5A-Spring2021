@@ -1,34 +1,44 @@
 <html><head><title>Admin</title></head><body>
 <?php
 
-//suffix indicates where to start searching for overlap
-function detectOverlap($min, $max, $suffix) {
-	$valid = true;
-	$futureMin = "feesData" . $suffix;
-	while(isset($_POST[$futureMin])) {
-		if( $_POST[$min] == $_POST[$futureMin] ) {
+	//suffix indicates where to start searching for overlap
+	function detectOverlap($min, $max, $suffix) {
+		$valid = true;
+		if( $_POST[$min] > $_POST[$max] ) {
 			$valid = false;
 		}
 
-		if( $_POST[$min] > $_POST[$futureMin] ) {
-			$futureMax = "feesData" . ($suffix+1);
-			if ($_POST[$min] < $_POST[$futureMax]) {
+		$futureMin = "feesData" . $suffix;
+		while(isset($_POST[$futureMin])) {
+			if( $_POST[$min] == $_POST[$futureMin] ) {
 				$valid = false;
 			}
+
+			// see if new entry weights are within existing entry's
+			if( $_POST[$min] > $_POST[$futureMin] ) {
+				$futureMax = "feesData" . ($suffix+1);
+				if ($_POST[$min] <= $_POST[$futureMax]) {
+					$valid = false;
+				}
+			}
+
+			// see if existing entry weights are within new entry's
+			if( $_POST[$futureMin] > $_POST[$min] ) {
+				if( $_POST[$futureMin] < $_POST[$max] ) {
+					$valid = false;
+				}
+			}
+
+			$suffix += 3;
+			$futureMin = "feesData" . $suffix;
 		}
-		$suffix += 3;
-		$futureMin = "feesData".$suffix;
-	}
 
-	if( $_POST[$min] > $_POST[$max] ) {
-		$valid = false;
+		return $valid;
 	}
-
-	return $valid;
-}
 
 try {
-    // set up database connection
+
+    # set up database connection
     $dsn = "mysql:host=courses;dbname=z1894526";
     $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -62,7 +72,7 @@ try {
 		$rs = $pdo->query("SELECT min_weight FROM Shipping_Cost ORDER BY min_weight ASC;");
 		$minWeights = $rs->fetchAll(PDO::FETCH_COLUMN);	
 		$rowNum = 1;
-		$deleted=array();
+		$deleted=array();	//stores row numbers of deleted rows
 		foreach($minWeights as $minWeight) {
 			$name = "delete".$minWeight;	//name of index in $_POST array
 			//replace because decimals become underlines in $_POST for some reason
@@ -79,75 +89,72 @@ try {
 		}
 
 		//prevent overlapping weight brackets
-		//for each min weight
-		//	for each min weights after current one
-		//		if equal to future min weight
+		//for each weight bracket
+		//	if less than current max weight
+		//		return error
+		//	for each weight bracket except current one
+		//		if min_weight equal to other min weight
 		//			return error
-		//	   if greater than future min weight
+		//	   if min_weight greater than other min weight
 		//			if current min weight is less than that row's max weight
 		//				return error
 		//			endif	
 		//		endif
+		//
 		//	end for loop
-		//if less than current max weight
-		//	return error
 
-		$suffix = 1;
-		$min = "feesData" . $suffix;
-		$max = "feesData" . ($suffix+1);
+		$currentSuffix = 1;
+		$min = "feesData" . $currentSuffix;
+		$max = "feesData" . ($currentSuffix+1);
 		$rowNum = 1;
-		$futureSuffix = $suffix + 3;
 		$valid = true;
 		// for each row in the shipping cost table
 		while(isset($_POST[$min])) {
-			// detect any overlap with future rows
-			// this part is messed up ugh
-			$futureRowNum = $rowNum + 1;
-			$futureMin = "feesData" . $futureSuffix;
-			// for each future row in the table that was displayed
-			while(isset($_POST[$futureMin])) {
-				if(!$deleted[$rowNum] and !$deleted[$futureRowNum]) {
-					if( $_POST[$min] == $_POST[$futureMin] ) {
-						$valid = false;
-					}
-
-					if( $_POST[$min] > $_POST[$futureMin] ) {
-						$futureMax = "feesData" . ($futureSuffix+1);
-						if ($_POST[$min] < $_POST[$futureMax]) {
+			if( $_POST[$min] > $_POST[$max] and !$deleted[$rowNum]) {
+				$valid = false;
+			}
+			$otherRowNum = 1;
+			$otherSuffix = 1;
+			$otherMin = "feesData" . $otherSuffix;
+			// detect any overlap with other table rows
+			// for each "other" row in the table that was displayed
+			while(isset($_POST[$otherMin])) {
+				// if not comparing row to itself
+				if($currentSuffix != $otherSuffix) {
+					if(!$deleted[$rowNum] and !$deleted[$otherRowNum]) {
+						if( $_POST[$min] == $_POST[$otherMin] ) {
 							$valid = false;
+						}
+
+						if( $_POST[$min] > $_POST[$otherMin] ) {
+							$otherMax = "feesData" . ($otherSuffix+1);
+							if ($_POST[$min] <= $_POST[$otherMax]) {
+								$valid = false;
+							}
 						}
 					}
 				}
-
-				if( $_POST[$min] > $_POST[$max] and !$deleted[$rowNum]) {
-					$valid = false;
-				}
-
-				$futureSuffix += 3;
-				$futureMin = "feesData".$futureSuffix;
-				$futureRowNum++;
+				$otherSuffix += 3;
+				$otherMin = "feesData".$otherSuffix;
+				$otherRowNum++;
 			}
 			if(!$valid) {
-				// if overlapped with row marked for deletion then dont do this
 				echo "Error in input: Weight brackets may not overlap";
 				echo "<br/>";
 				break;	//stop searching for errors
 			}
 
 			// change min and max to match with next row
-			$suffix += 3;
-			$futureSuffix += 3;
-			$min = "feesData".$suffix;
-			$max = "feesData" . ($suffix+1);
+			$currentSuffix += 3;
+			$min = "feesData".$currentSuffix;
+			$max = "feesData" . ($currentSuffix+1);
 			$rowNum++;
-		}
+		}	// for each row in displayed table
 
 		if($valid) {
 			// process input
 			// if a weight bracket was modified
-			// 
-			// update that row in the database
-			// easier said than done lol
+			//		update that row in the database
 			$original = $pdo->query("SELECT * FROM Shipping_Cost ORDER BY min_weight ASC;");
 			$suffix = 1;
 			$rowNum = 0;
@@ -183,15 +190,12 @@ try {
 					$suffix += 3;
 					$min = "feesData" . $suffix;
 				}
-				// print_r($deleted);
 			}
 		}	// if modified brackets don't overlap
 	}	// if the form to modify shipping costs table was submitted
 
-//	echo '$_POST array:<br/>';
-//	print_r($_POST);
-//	echo "<br/>";
-
+	// stop processing POST requests
+	
     // query for shipping costs
 	echo "<h2>Shipping Charges</h2>";
 	$sql = "SELECT min_weight AS 'Min Weight', " .
