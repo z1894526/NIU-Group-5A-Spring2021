@@ -3,6 +3,7 @@ DROP TABLE Shipping_Cost;
 DROP TABLE Part_Order;
 DROP TABLE Order_;
 DROP TABLE Customer;
+DROP TABLE Inventory;
 
 # ^ = primary key, * = foreign key
 # Customer(customer_id^, first_name, last_name, email, mailing_addr)
@@ -64,7 +65,16 @@ CREATE TABLE Shipping_Cost
 	PRIMARY KEY	(price, min_weight, max_weight)
 );
 
+CREATE TABLE Inventory
+(
+	part_number INT,
+	quantity_on_hand INT,
+
+	PRIMARY KEY (part_number)
+);
+
 DESCRIBE Customer;
 DESCRIBE Order_;
 DESCRIBE Part_Order;
 DESCRIBE Shipping_Cost;
+DESCRIBE Inventory;
