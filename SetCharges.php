@@ -2,6 +2,7 @@
 <?php
     //suffix indicates where to start searching for overlap
     function detectOverlap($min, $max, $suffix) {
+	echo "<br/><br/>";
         $valid = true;
         if( $_POST[$min] > $_POST[$max] ) {
             $valid = false;
@@ -175,9 +176,14 @@ try {
                         // update the database
                         $sql = "UPDATE Shipping_Cost SET min_weight = ?, " .
                             "max_weight = ?, price = ? " .
-                            "WHERE min_weight= ?";
-                        $stmt = $pdo->prepare($sql);
-$stmt->execute(array($_POST[$min], $_POST[$max], $_POST[$price], $origBracket["min_weight"]));
+                            "WHERE min_weight = CAST(? AS DECIMAL(8,2));";	//ABSOLUTELY NEED THE CAST
+						$stmt = $pdo->prepare($sql);
+						$stmt->bindValue(1, $_POST[$min]);
+						$stmt->bindValue(2, $_POST[$max]);
+						$stmt->bindValue(3, $_POST[$price]);
+						$stmt->bindValue(4, $origBracket["min_weight"]);
+						$stmt->execute();
+						$stmt->debugDumpParams();
                     }
                     $suffix++;
                     $min = "feesData" . $suffix;
@@ -222,15 +228,15 @@ $stmt->execute(array($_POST[$min], $_POST[$max], $_POST[$price], $origBracket["m
                     echo "$";
                 }
                 echo "<input type=number min=0 step=0.01 value=\"$item\"" .
-                    " name=\"feesData".$suffix."\"/> </td>";
+                    " name=\"feesData".$suffix."\" required/> </td>";
                 ++$suffix;
             }
-            echo "<td> <input type=checkbox name=delete".$rowWeight["Min Weight"]." value=delete /> </td>";
+			echo "<td> <input type=checkbox name=delete".$rowWeight["Min Weight"]." value=delete /> </td>";
             echo "</tr>";
         }
         echo "</table>";
-        echo "<input type=submit name=changeFees value=Submit /> ";
-        echo "<form/>";
+        echo "<input type=submit name=changeFees value=Submit required /> ";
+//        echo "</form>";	page is dependent on this not being here
     }
 
     // form to add a row to shipping cost table
