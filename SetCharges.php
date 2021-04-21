@@ -1,6 +1,5 @@
-<html><head><title>Admin</title></head><body>
+<html><head><title>Set shipping charges</title></head><body>
 <?php
-
 	//suffix indicates where to start searching for overlap
 	function detectOverlap($min, $max, $suffix) {
 		$valid = true;
@@ -45,8 +44,6 @@ try {
 
 	// add an inputted weight bracket
 	if (isset($_POST["newWeights"])) {
-//		echo $_POST["newPrice"];
-//		echo "<br/>";
 
 		$valid = detectOverlap("newMin","newMax",1);
 
@@ -176,11 +173,11 @@ try {
 							$_POST[$max] != $origBracket["max_weight"] OR
 							$_POST[$price] != $origBracket["price"] ) {
 						// update the database
-						$sql = "UPDATE Shipping_Cost SET min_weight = {$_POST[$min]}, " .
-							"max_weight = {$_POST[$max]}, price = {$_POST[$price]} " .
-							"WHERE min_weight= {$origBracket["min_weight"]}";
-						//safe because input restricted to numbers
-						$pdo->query($sql);
+						$sql = "UPDATE Shipping_Cost SET min_weight = ?, " .
+							"max_weight = ?, price = ? " .
+							"WHERE min_weight= ?";
+						$stmt = $pdo->prepare($sql);
+$stmt->execute(array($_POST[$min], $_POST[$max], $_POST[$price], $origBracket["min_weight"]));
 					}
 					$suffix++;
 					$min = "feesData" . $suffix;
