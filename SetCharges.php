@@ -2,11 +2,15 @@
 <?php
     //suffix indicates where to start searching for overlap
     function detectOverlap($min, $max, $suffix) {
-	echo "<br/><br/>";
         $valid = true;
         if( $_POST[$min] > $_POST[$max] ) {
             $valid = false;
         }
+
+		// prevents error when nothing is entered
+        if( empty($_POST[$min]) ) {
+			$_POST[$min] = 0;
+		}
 
         $futureMin = "feesData" . $suffix;
         while(isset($_POST[$futureMin])) {
@@ -137,7 +141,7 @@ try {
                 $otherRowNum++;
             }
             if(!$valid) {
-                echo "Error in input: Weight brackets may not overlap";
+                echo "<span>Error in input: Weight brackets may not overlap</span>";
                 echo "<br/>";
                 break;    //stop searching for errors
             }
@@ -183,7 +187,6 @@ try {
 						$stmt->bindValue(3, $_POST[$price]);
 						$stmt->bindValue(4, $origBracket["min_weight"]);
 						$stmt->execute();
-						$stmt->debugDumpParams();
                     }
                     $suffix++;
                     $min = "feesData" . $suffix;
@@ -199,8 +202,9 @@ try {
 
     // stop processing POST requests
     
-    // query for shipping costs
+	echo "<a href=\"AdminConsoleInterface.php\">Click here to view all orders</a>";
     echo "<h2>Shipping Charges</h2>";
+    // query for shipping costs
     $sql = "SELECT min_weight AS 'Min Weight', " .
         "max_weight AS 'Max Weight', price AS 'Price' FROM Shipping_Cost " .
         "ORDER BY min_weight ASC;";
@@ -247,8 +251,6 @@ try {
     echo "<input type=number min=0 step=0.01 placeholder=price name=newPrice id=newPrice />";
     echo "<input type=submit name=newWeights id=newWeights value=\"Create entry\"/>";
     echo "</form>";
-    
-    echo "<br></br>";
 }
 
 catch(PDOexception $e) { 

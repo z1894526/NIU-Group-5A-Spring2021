@@ -39,8 +39,8 @@ try {
         if($_GET["status"] == "ordered") {
             $status = "Ordered";
         }
-        else if($_GET["status"] == "fulfilled") {
-            $status = "Fulfilled";
+        else if($_GET["status"] == "completed") {
+            $status = "Completed";
         }
 
         if(!empty($_GET["dateMin"])) {
@@ -102,14 +102,14 @@ try {
     }
 
 ?>
-    <div> <a href="../SetCharges.php">Click here to set shipping charges</a> <br/>
+    <div> <a href="SetCharges.php">Click here to set shipping charges</a> <br/>
     <form method="get" action="AdminConsoleInterface.php">
     <span>Filter orders</span> <br/>
     <label for="status">Status</label>
     <select name="status">
     <option value="any">Any</option>
     <option value="ordered">Ordered</option>"
-    <option value="fulfilled">Fulfilled</option>
+    <option value="completed">Completed</option>
     </select> <br/>
     <label for="dateMin">Date Range</label>
     <input type="date" name="dateMin"/> - 
