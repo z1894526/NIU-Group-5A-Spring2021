@@ -23,7 +23,7 @@ input[type=submit]:hover {
 </style></head><body>
 <?php
 
-function draw_table_warehouse($rows) {
+function draw_table_order($rows) {
     echo "<head>
     <style>
         body {background-color: white;}
@@ -35,23 +35,16 @@ function draw_table_warehouse($rows) {
     echo "<table border=1 cellspacing=1 cellpadding=1>";
     echo "<tr>";
 
-    foreach($rows[0] as $key => $item)
-    {
-        if ($key != 'filled_date') {
-            echo "<th>$key</th>";
-        }
-    }
-    echo "<th>Select</th>";
+    echo "<th>Part Number</th>";
+    echo "<th>Description</th>";
+    echo "<th>Quantity</th>";
     echo "</tr>";
     foreach($rows as $row){
         echo "<div>";
         echo "<tr>";
         foreach($row as $key => $item){
-            if ($key != 'filled_date') {
-                echo "<td>$item</td>";
-            }
+            echo "<td>$item</td>";
         }
-        echo '<td><input type="radio" name="orderselect" value="'.$row['order_id'].'" id="'.$row['order_id'].'"></td>';
         echo"</tr>";
         echo "</div>";
     }
@@ -64,23 +57,18 @@ try {
     $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-    # Get Customers Info
-    $rs = $pdo->query("SELECT * FROM Order_ WHERE status = \"Purchased\";");
-    $rows = $rs->fetchAll(PDO::FETCH_ASSOC);
+    # Get part data
+    $orderval = $_POST["orderselect"];
+    $sql = "SELECT part_num, item_name, quantity FROM Part_Order WHERE order_id = '$orderval';";
+    $rs = $pdo->query($sql);
+    $rowsParts = $rs->fetchAll(PDO::FETCH_ASSOC);
 
     echo "<div class=\"mainStyle\">";
     echo "<hr></hr>";
-    echo "<h2>Unfulfilled Orders</h2>";
+    echo "<h2>Order #$orderval Packing List</h2>";
 
-    echo"<form method=\"get\" action=\"ManageOrder.php\">";
-    draw_table_warehouse($rows);
+    draw_table_order($rowsParts);
     echo "</br/>";
-
-    # Buttons to manage order
-    echo "<br></br>";
-    echo"<input type=\"submit\" class=\"buttonStyle\" name=\"button2\" value=\"Manage Order\">";
-    echo"</form>";
-    echo "<br/><br/>";
     echo "</div>";
 }
 catch(PDOexception $e) { // handle that exception

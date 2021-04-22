@@ -85,9 +85,14 @@ try {
     echo "<input type=\"submit\" class=\"buttonStyle\" name=\"button2\" value=\"Print Packing List\">";
     echo "</form>";
 
-    echo "<form method=\"post\" action=\"PrintLabels.php\">";
+    echo "<form method=\"post\" action=\"PrintLabel.php\">";
     echo "<input type=\"hidden\" id=\"orderselect\" name=\"orderselect\" value=$orderval>";
-    echo "<input type=\"submit\" class=\"buttonStyle\" name=\"button2\" value=\"Print Shipping Labels\">";
+    echo "<input type=\"submit\" class=\"buttonStyle\" name=\"button2\" value=\"Print Shipping Label\">";
+    echo "</form>";
+
+    echo "<form method=\"post\" action=\"PrintInvoice.php\">";
+    echo "<input type=\"hidden\" id=\"orderselect\" name=\"orderselect\" value=$orderval>";
+    echo "<input type=\"submit\" class=\"buttonStyle\" name=\"button2\" value=\"Print Shipping Invoice\">";
     echo "</form>";
 
     echo "<form method=\"post\" action=\"CompleteOrder.php\">";
