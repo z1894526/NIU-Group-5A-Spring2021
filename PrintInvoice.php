@@ -76,6 +76,7 @@ try {
     $customer_zip = $rowsCustomer[0]['zip_addr'];
 
     # Shipping info
+    echo '<div class="centerDiv">';
     echo "<div class=\"mainStyle\">";
     echo "<hr></hr>";
     echo "<h2>Order #$orderval Shipping Invoice</h2>";
@@ -101,7 +102,7 @@ try {
     echo "<p>ITEMS:</p>";
     draw_table_invoice($rowsPOrder);
     echo "<p>SUBTOTAL: \$$order_price</p>";
-    echo "</div>";
+    echo "</div></div>";
 }
 catch(PDOexception $e) { // handle that exception
     echo "Connection to database failed: " . $e->getMessage();
