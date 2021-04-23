@@ -17,8 +17,8 @@ try {
     $priceMax = 999999.99;
     
     if( isset($_GET["filter"]) ) {
-        if($_GET["status"] == "ordered") {
-            $status = "Ordered";
+        if($_GET["status"] == "authorized") {
+            $status = "Authorized";
         }
         else if($_GET["status"] == "completed") {
             $status = "Completed";
@@ -42,7 +42,7 @@ try {
     }
     
     if(isset($_GET["order_id"])) {
-        echo "<a href=\"{$_SERVER["PHP_SELF"]}\">Go back to viewing orders</a><br/>";
+        echo "<a href=\"AdminConsoleInterface.php\">Go back to viewing orders</a><br/>";
         echo "<h2>Order Detail for Order Number {$_GET["order_id"]}</h2>";
         echo "<h3>Order Information</h3>";
         $rs = $pdo->prepare("SELECT * FROM Order_ WHERE order_id = :order_id");
@@ -83,14 +83,17 @@ try {
     }
 
 ?>
+
+<div style="inline-size: 150px; overflow-wrap: break-word; float: right;">
+<a href="SetCharges.php"> Click here to set shipping charges</a> <br/>
+</div>
 <div class="adminContainer">
-    <a href="SetCharges.php">Click here to set shipping charges</a> <br/>
     <form method="get" action="AdminConsoleInterface.php">
-    <span>Filter orders</span> <br/>
+    <div style="text-align: center;">Filter orders by:</div> 
     <label for="status">Status</label>
     <select name="status">
     <option value="any">Any</option>
-    <option value="ordered">Ordered</option>"
+    <option value="authorized">Authorized</option>"
     <option value="completed">Completed</option>
     </select> <br/>
     <label for="dateMin">Date Range</label>
@@ -106,7 +109,7 @@ try {
 <?php
 
     // display orders using filters (if any)
-    echo "<h2>Order</h2>";
+    echo "<h2> Orders </h2>";
     $sql = "SELECT * FROM Order_ WHERE status LIKE :status " .
         "AND ordered_date >= :dateMin AND ordered_date <= :dateMax " .
         "AND price_total >= :priceMin AND price_total <= :priceMax;";
@@ -129,7 +132,7 @@ try {
             foreach($rowOrder as $key => $item){
                 if($key == "order_id") {
                     // link to details of the order
-                    echo "<td> <a href=\"{$_SERVER["PHP_SELF"]}?order_id=$item\"> $item </a> </td>";
+                    echo "<td> <a href=\"AdminConsoleInterface.php?order_id=$item\"> $item </a> </td>";
                 }
                 else {    
                     echo "<td>$item</td>";
@@ -142,12 +145,6 @@ try {
     else {
         echo "<p> No results found </p> <br/>";
     }
-
-    # Part_Order Table calling Function to draw table
-    echo "<h2>Parts Ordered</h2>";
-    $rs = $pdo->query("SELECT * FROM Part_Order;");
-    $ps = $rs->fetchAll(PDO::FETCH_ASSOC);
-    draw_table($ps);
 
     # Customer Table calling Function to draw table
     echo "<h2>Customers in the Database</h2>";

@@ -45,9 +45,7 @@ include 'NavHeader.php';
 try {
 
     # set up database connection
-    $dsn = "mysql:host=localhost;dbname=z1894526";
-    $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$pdo = ConnectToDatabase();
     echo '<div id="top_div">';
     // add an inputted weight bracket
     if (isset($_POST["newWeights"])) {
@@ -189,7 +187,6 @@ try {
 						$stmt->bindValue(3, $_POST[$price]);
 						$stmt->bindValue(4, $origBracket["min_weight"]);
 						$stmt->execute();
-						$stmt->debugDumpParams();
                     }
                     $suffix++;
                     $min = "feesData" . $suffix;
@@ -225,7 +222,7 @@ try {
         echo "</tr>";        
 
         $suffix=1;
-        echo "<form method=\"post\" action=\"{$_SERVER["PHP_SELF"]}\">";
+        echo "<form method=\"post\" action=\"SetCharges.php\">";
         foreach($rowsWeights as $rowWeight){
             echo "<tr> ";
             foreach($rowWeight as $key => $item){
@@ -248,7 +245,7 @@ try {
     // form to add a row to shipping cost table
     echo'<div class="adminContainer">';
     echo "<h3>Create a new weight bracket</h3>";
-    echo "<form method=\"post\" action=\"{$_SERVER["PHP_SELF"]}\">";
+    echo "<form method=\"post\" action=\"SetCharges.php\">";
     echo "<input class=\"inputTextSelect\" type=number min=0 step=0.01 placeholder=\"min weight\" name=newMin id=newMin />";
     echo "<input class=\"inputTextSelect\" type=number min=0 step=0.01 placeholder=\"max weight\" name=newMax id=newMax />";
     echo "<input class=\"inputTextSelect\" type=number min=0 step=0.01 placeholder=price name=newPrice id=newPrice />";

@@ -21,7 +21,7 @@ try {
     $shippingCostArray = $rs->fetchAll(PDO::FETCH_ASSOC);
 
     foreach($shippingCostArray as $shippingCost) {
-        if($totalWeight < $shippingCost["max_weight"] && $totalWeight > $shippingCost["min_weight"]){
+        if($totalWeight <= $shippingCost["max_weight"] && $totalWeight >= $shippingCost["min_weight"]){
             $shippingPrice = $shippingCost["price"];
             break;
         }
