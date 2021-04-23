@@ -9,10 +9,7 @@ $Legacypdo;
 function draw_table_invoice($rows) {
     echo "<head>
     <style>
-        body {background-color: white;}
         table {text-align: center;}
-        tr {padding-top: 10px;}
-        img { object-fit: contain}
     </style>
     </head>";
     echo "<table border=1 cellspacing=1 cellpadding=1>";
