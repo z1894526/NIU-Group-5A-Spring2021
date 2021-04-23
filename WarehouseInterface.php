@@ -58,7 +58,9 @@ try {
 
     # Buttons to manage order
     echo "<br></br>";
+    echo '<div class="footer">';
     echo"<input type=\"submit\" class=\"buttonStyle\" name=\"button2\" value=\"Manage Order\">";
+    echo '</div>';
     echo"</form>";
     echo "<br/><br/>";
     echo "</div>";
