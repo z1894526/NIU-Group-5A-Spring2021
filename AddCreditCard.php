@@ -43,9 +43,9 @@ $calculatedTotalAmount = '$' . number_format(($totalPrice + $shippingPrice), 2);
 <label>Name on Card</label><br/> 
 <input type="text" class="inputTextSelect" placeholder="Name on card..." name="Name"/><br/><br/> 
 <label>Credit Card transIdber</label><br/> 
-<input type="text" class="inputTextSelect" placeholder="Credit Card..." name="cc" value="6011 1234 4321 1234"/><br/><br/>   <!-- DELETE VALUE AFTER TESTING -->
+<input type="text" class="inputTextSelect" placeholder="Credit Card..." name="cc"/><br/><br/>
 <label>Expiration Date (MM/YYYY)</label><br/> 
-<input type="text" class="inputTextSelect" placeholder="Expiration date..." name="exp" value="08/2022"/><br/><br/>          <!-- DELETE VALUE AFTER TESTING -->
+<input type="text" class="inputTextSelect" placeholder="Expiration date..." name="exp"/><br/><br/>
 <br/><br/> 
 <label style="font-size: 16px;"><?php echo "Order Amount: ".$formatTotalPrice ?></label><br/> 
 <label style="font-size: 16px;"><?php echo "Shipping Amount: ".$formatShippingPrice ?></label><br/>
@@ -84,11 +84,10 @@ if(isset($_POST['AddCC'])) {
             )
         );
 
-        // $context  = stream_context_create($options);
-        // $result = file_get_contents($url, false, $context);
-        // $obj = json_decode($result);
-        // if($obj->authorization) { // Authorized
-        if(true) {
+        $context  = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        $obj = json_decode($result);
+        if($obj->authorization) { // Authorized
             $sql = "UPDATE Order_ SET `status`='Authorized', `price_total`='$totalPrice'  WHERE order_id=$orderId;";
             if (!$pdo->query($sql)) {
                 echo "\nOrder, Problem Creating Record";
