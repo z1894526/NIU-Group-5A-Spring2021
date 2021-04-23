@@ -89,12 +89,14 @@ try {
 
 ?>
 
-<div style="inline-size: 150px; overflow-wrap: break-word; float: right;">
+<div class="adminContainer">
 <a href="SetCharges.php"> Click here to set shipping charges</a> <br/>
 </div>
+
+</div> </br>
 <div class="adminContainer">
     <form method="get" action="AdminConsoleInterface.php">
-    <div style="text-align: center;">FiltFer orders by:</div> 
+    <div style="text-align: center;">Filter orders by:</div> 
     <label for="status">Status</label>
     <select name="status">
     <option value="any">Any</option>
@@ -153,12 +155,13 @@ try {
     }
 
     # Customer Table calling Function to draw table
-    echo "<h2>Customers in the Database</h2>";
-    $rs = $pdo->query("SELECT * FROM Customer;");
-    $rowsCustomer = $rs->fetchAll(PDO::FETCH_ASSOC);
-    draw_table($rowsCustomer);
+    // echo "<h2>Customers in the Database</h2>";
+    // $rs = $pdo->query("SELECT * FROM Customer;");
+    // $rowsCustomer = $rs->fetchAll(PDO::FETCH_ASSOC);
+    // draw_table($rowsCustomer);
 
     echo '</div>';
+    echo '</br></br></br>';
 
 }
 catch(PDOexception $e) {
