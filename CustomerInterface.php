@@ -57,7 +57,7 @@ function createProductCatelog($rowsParts, $partQtys) {
     foreach($rowsParts as $part){
         ?>
         <div class="grid-item"><tr><td>
-        <form method="post"> 
+        <form id="<?php echo $part['number'] ?>" method="post" action="CustomerInterface.php?#<?php echo $part['number'] ?>"> 
         <input type="hidden" name="productId" style="width:0; height=0;" value="<?php echo $part['number'];?>" />
             <img src="<?php echo $part['pictureURL'] ?>" style="width:200px; height=200px;">
             <h3 style="height: 50px;"><?php echo $part['description'] ?></h3>

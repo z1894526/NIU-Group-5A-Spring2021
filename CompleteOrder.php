@@ -35,7 +35,7 @@ try {
         $sql = "UPDATE Order_ SET status='Completed', filled_date='$currentDateTime' WHERE order_id=$orderval;";
         $rs = $pdo->query($sql);
 
-        $sql = "SELECT * FROM part_order WHERE order_id = $orderval;";
+        $sql = "SELECT * FROM Part_Order WHERE order_id = $orderval;";
         $rs = $pdo->query($sql);
         $partOrder = $rs->fetchAll(PDO::FETCH_ASSOC);
 
