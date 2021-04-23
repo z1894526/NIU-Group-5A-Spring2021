@@ -29,6 +29,7 @@ try {
     $customer_zip = $rowsCustomer[0]['zip_addr'];
 
     # Label
+    echo '<div class="centerDiv">';
     echo "<div class=\"mainStyle\">";
     echo "<hr></hr>";
     echo "<h2>Order #$orderval Shipping Label</h2>";
@@ -37,6 +38,7 @@ try {
     echo "<p>WEIGHT: $weight</p>";
     echo "<p>ORDER#: $orderval</p>";
     echo "</div>";
+    echo '</div>';
 }
 catch(PDOexception $e) { // handle that exception
     echo "Connection to database failed: " . $e->getMessage();
