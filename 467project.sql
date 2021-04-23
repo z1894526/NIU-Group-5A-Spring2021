@@ -1,4 +1,5 @@
 # Delete pre-existing tables
+DROP TABLE Inventory;
 DROP TABLE Shipping_Cost;
 DROP TABLE Part_Order;
 DROP TABLE Order_;
@@ -19,9 +20,6 @@ CREATE TABLE Customer
 
 	PRIMARY KEY	(customer_id)
 );
-INSERT INTO Customer
-	(first_name, last_name, email, street__addr, city_addr, state_addr, zip_addr)
-	VALUES('Jason', 'Haut', 'z1894526@students.niu.edu', '123 Dekalb Drive', 'Dekalb', 'IL', '60115');
 
 #Order_(order_id^, order_num, customer_id*, filled_date, ordered_date, status, weight_total, price_total)
 CREATE TABLE Order_
@@ -31,15 +29,12 @@ CREATE TABLE Order_
 	filled_date DATETIME,
 	ordered_date DATETIME,
 	status VARCHAR(10),
-	weight_total FLOAT,
-	price_total FLOAT,
+	weight_total FLOAT(6,2),
+	price_total FLOAT(8,2),
 
 	PRIMARY KEY	(order_id),
 	FOREIGN KEY	(customer_id) REFERENCES Customer(customer_id) 
 );
-INSERT INTO Order_
-	(filled_date, ordered_date, status, weight_total, price_total)
-	VALUES('2021-04-02 14:21:34', '2021-04-01 08:30:52', 'Orderd', '20', '80.00');
 
 #Part_Order(part_order_id^, order_id*, part_num*, item_name, order_num, quantity)
 CREATE TABLE Part_Order
@@ -57,14 +52,26 @@ CREATE TABLE Part_Order
 #Shipping_Cost(price^, order_id*, min_weight^, max_weight^)
 CREATE TABLE Shipping_Cost
 (
-	price FLOAT NOT NULL,
-	min_weight FLOAT NOT NULL,
-	max_weight FLOAT NOT NULL,
+	bracket_id INT NOT NULL AUTO_INCREMENT,
+	price FLOAT(8,2) NOT NULL,
+	min_weight FLOAT(6,2) NOT NULL,
+	max_weight FLOAT(6,2) NOT NULL,
 
-	PRIMARY KEY	(price, min_weight, max_weight)
+	PRIMARY KEY	(bracket_id)
+);
+
+#Inventory(part_number*, part_desc*, quantity_on_hand )
+CREATE TABLE Inventory
+(
+    part_number INT NOT NULL,
+	part_desc VARCHAR(30),
+    quantity_on_hand  INT,
+
+    PRIMARY KEY (part_number)
 );
 
 DESCRIBE Customer;
 DESCRIBE Order_;
 DESCRIBE Part_Order;
 DESCRIBE Shipping_Cost;
+DESCRIBE Inventory;
