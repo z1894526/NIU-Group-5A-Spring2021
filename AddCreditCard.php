@@ -4,18 +4,19 @@
 <body>
 <?php
 session_start();
-session_destroy();
+session_destroy(); // Clears Order History
 include 'NavHeader.php';
 
+// <?php
+// Get Data from AddPartToOrder.php
 $totalPrice = $_GET["total_price"];
 $totalWeight = $_GET["total_weight"];
 $orderId = $_GET["order_id"];
 $shippingPrice = 0;
 $pdo;
+
 try {
-    $dsn = "mysql:host=courses;dbname=z1894526";
-    $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = ConnectToDatabase();
     $rs = $pdo->query("SELECT * FROM Shipping_Cost;");
     $shippingCostArray = $rs->fetchAll(PDO::FETCH_ASSOC);
 
@@ -25,7 +26,7 @@ try {
             break;
         }
     }
-} catch(PDOexception $e) { // handle that exception
+} catch(PDOexception $e) {/* Exception Handler */
     echo "Connection to database failed: " . $e->getMessage();
 }
 
@@ -35,8 +36,8 @@ $calculatedTotalAmount = '$' . number_format(($totalPrice + $shippingPrice), 2);
 
 ?>
 
-<div class="container">
-<hr></hr>
+<div class="outterContainer">
+<div class="innerContainer">
 <h2>Add Credit Card</h2>
 <form style="text-align: left;" method="post">
 <label>Name on Card</label><br/> 
@@ -54,6 +55,11 @@ $calculatedTotalAmount = '$' . number_format(($totalPrice + $shippingPrice), 2);
 <br></br>
 <input type="submit" class="inputSubmit" name="AddCC" value="Submit Credit Card">
 </form>
+<br/>
+   <form  action="CustomerOrder.php">
+      <input class="back" type="submit" value="Back" />
+   </form >
+</div>
 </div>
 
 <?php
@@ -78,11 +84,12 @@ if(isset($_POST['AddCC'])) {
             )
         );
 
-        $context  = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
-        $obj = json_decode($result);
-        if($obj->authorization) { // Authorized
-            $sql = "UPDATE Order_ SET `status`='Purchased', `price_total`='$totalPrice'  WHERE order_id=$orderId;";
+        // $context  = stream_context_create($options);
+        // $result = file_get_contents($url, false, $context);
+        // $obj = json_decode($result);
+        // if($obj->authorization) { // Authorized
+        if(true) {
+            $sql = "UPDATE Order_ SET `status`='Authorized', `price_total`='$totalPrice'  WHERE order_id=$orderId;";
             if (!$pdo->query($sql)) {
                 echo "\nOrder, Problem Creating Record";
             }

@@ -2,15 +2,14 @@
 <html>
 <title>Group 5A: Confirmation Page</title>
 <body><?php
+session_start();
+session_destroy(); // Clears Order History
 include 'NavHeader.php';
 $transId = $_GET["trans_id"];
 $orderId = $_GET["order_id"];
 
 try {
-    $dsn = "mysql:host=courses;dbname=z1894526";
-    $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+    $pdo = ConnectToDatabase();
     $Legacydsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
     $Legacypdo = new PDO($Legacydsn, $username = "student", $password = "student");
     $Legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -41,13 +40,17 @@ try {
 
     // CONFIRMATION PANEL
     ?>
-    <div class="container">
-    <h2>Purchase Confirmed</h2>  
-    <div class="leftAligned">
-    <label style="font-size: 16px;"><?php echo 'ORDER ID: '.$orderId.' ORDERD ON: '.$orderedDate; ?></label><br/> 
-    <label style="font-size: 16px;"><?php echo 'TOTAL PRICE: $'.$totalPrice.'    |   STATUS: '.$status; ?></label><br/> 
-    <label style="font-size: 16px;"><?php echo 'ORDER WEIGHT: '.$totalWeight.'lbs SHIPPED TO '.$fName.' '.$lName; ?></label><br/> 
-    <label style="font-size: 16px;"><?php echo 'DELIVERY ADDRESS: '.$street.' '.$city.', '.$state.' '.$zip; ?></label><br/> 
+    <div class="outterContainer">
+    <div class="innerContainer">
+    <h2>Purchase Confirmed</h2>
+    <label style="font-size: 16px;"><?php echo $status.' ON: '.$orderedDate; ?></label><br/> 
+    <label style="font-size: 16px;"><?php echo 'ORDER #: '.$orderId; ?></label>
+    <label style="font-size: 16px;"><?php echo ' | TOTAL: $'.$totalPrice; ?></label>
+    <label style="font-size: 16px;"><?php echo ' | WEIGHT: '.$totalWeight.'lbs'; ?></label><br/> 
+    <br/> 
+    <label style="font-size: 16px;"><?php echo $fName.' '.$lName; ?></label><br/> 
+    <label style="font-size: 16px;"><?php echo $street; ?></label><br/> 
+    <label style="font-size: 16px;"><?php echo $city.', '.$state.' '.$zip; ?></label><br/> 
     </div>
     </div>  
     <?php

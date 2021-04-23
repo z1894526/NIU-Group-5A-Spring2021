@@ -1,31 +1,9 @@
-<html><head><title>Group 5A Product System</title></head><body>
+<html><head><title>Group 5A: Developer View</title></head><body>
 <?php
-
-function draw_table($rows) {
-    echo "<table border=1 cellspacing=1>";
-    echo "<tr>";
-    foreach($rows[0] as $key => $item)
-    {
-        echo "<th>$key</th>";
-    }
-    echo "</tr>";        
-
-    foreach($rows as $row){
-        echo "<tr>";
-        foreach($row as $key => $item){
-            echo "<td>$item</td>";
-        }
-        echo"</tr>";
-    }
-    echo "</table>";
-}
-
+include 'NavHeader.php';
 try {
-
     # Call to Maria database to get relevant tables
-    $dsn = "mysql:host=courses;dbname=z1894526";
-    $pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
-    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo = ConnectToDatabase();
 
     # Customer Table calling Function to draw table
     echo "<h2>Customer</h2>";
@@ -50,6 +28,12 @@ try {
     $rs = $pdo->query("SELECT * FROM Shipping_Cost;");
     $rowsWorkout = $rs->fetchAll(PDO::FETCH_ASSOC);
     draw_table($rowsWorkout);
+
+     # Shipping_Cost Table calling Function to draw table
+     echo "<h2>Party Quantity</h2>";
+     $rs = $pdo->query("SELECT * FROM Inventory;");
+     $rowsQty = $rs->fetchAll(PDO::FETCH_ASSOC);
+     draw_table($rowsQty);
 }
 catch(PDOexception $e) { // handle that exception
     echo "Connection to database failed: " . $e->getMessage();

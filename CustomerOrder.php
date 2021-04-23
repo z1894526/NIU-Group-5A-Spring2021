@@ -1,5 +1,6 @@
 <!DOCTYPE HTML>
 <html>
+    <!-- Previously AddPartToOrder.php -->
 <title>Group 5A: Add Parts To Order</title>
 <body>
 <?php
@@ -7,16 +8,14 @@ session_start();
 include 'NavHeader.php';
 // Variables
 $showDiv = false;
-
+$pdo;
+$Legacydsn;
 try {
-$dsn = "mysql:host=courses;dbname=z1894526";
-$pdo = new PDO($dsn, $username = "z1894526", $password = "1985May09");
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-$Legacydsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
-$Legacypdo = new PDO($Legacydsn, $username = "student", $password = "student");
-$Legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
+    $pdo = ConnectToDatabase();
+    $Legacypdo = ConnectToLegacyDB();
+} catch(PDOexception $e) { // handle that exception
+    echo "Connection to database failed: " . $e->getMessage();
+}
 //GET PARTS FROM LEGACY DB
 $rs = $Legacypdo->query("SELECT * FROM parts;");
 $rowsParts = $rs->fetchAll(PDO::FETCH_ASSOC);
@@ -82,7 +81,7 @@ if (isset($_SESSION['cart'])) {
    if(isset($_POST['continueCheckout'])) {
       if(!empty($_POST['customer'])) {
         $thisCustomer = $_POST['customer'];
-        $sql = "insert into Order_(ordered_date,customer_id,Status,weight_total,price_total) values ('$currentDateTime','$thisCustomer','Ordered','$totalWeight','$totalPrice');";
+        $sql = "insert into Order_(ordered_date,customer_id,Status,weight_total,price_total) values ('$currentDateTime','$thisCustomer','InCart','$totalWeight','$totalPrice');";
         if (!$pdo->query($sql)) {
             echo "\nOrder, Problem Creating Record";
         }
@@ -100,15 +99,15 @@ if (isset($_SESSION['cart'])) {
          echo "\nCustomer ID NOT Found.";
       }
    }
-   echo "<div class=\"cropDiv\">";
    // ADD NEW CUSTOMER FORM
-   ?><div class="container"><?php
+   ?>
+   <div class="outterContainer"><?php
    if ($showDiv) {
       ?>
       <form  method= "post" >
          <input class="inputSubmit" type="submit" name="hideButton" value="Existing Customer? Click here."/>
       </form >
-      <div class="container">
+      <div class="innerContainer">
       <h2>New Customer Form</h2> 
       <form style="text-align: left;" method="post"> 
          <label>First Name</label><br/> 
@@ -128,6 +127,10 @@ if (isset($_SESSION['cart'])) {
          <br/> 
          <input type="submit" class="inputSubmit" name="addCustomer" value="Add Customer"> 
       </form>
+      <br/>
+    <form  action="CustomerInterface.php">
+        <input class="back" type="submit" value="Back" />
+    </form >
       </div>  
       <?php
    } else {
@@ -136,9 +139,7 @@ if (isset($_SESSION['cart'])) {
       <form  method= "post" >
          <input class="inputSubmit" type="submit" name="showButton" value="New Customer? Lets set you up."/>
       </form >
-      <br/>
-      <!-- CONTINUE CHECKOUT FORM -->
-      
+      <div class="innerContainer">
       <form method="post">
          <label>Existing Customer: Select your name</label><br/>
          <select class="inputTextSelect" name="customer" id="Customer">
@@ -149,25 +150,17 @@ if (isset($_SESSION['cart'])) {
          }
          ?>
          </select>
-
-         <!-- Checkout Button -->
          <br/><br/>
          <input type="submit" class="inputSubmit" name="continueCheckout" value="Continue Checkout" />
       </form>
+      <br/>
+        <form  action="CustomerInterface.php">
+            <input class="back" type="submit" value="Back" />
+        </form >
+      </div>
    <?php
    }
-
-   // Back Button
-   ?><br/>
-   <form  action="CustomerInterface.php">
-      <input class="back" type="submit" value="Back" />
-   </form >
+   ?>
    </div>
-   </div>
-   <?php
-}
-catch(PDOexception $e) { // handle that exception
-    echo "Connection to database failed: " . $e->getMessage();
-}
-?></body>
+   </body>
 </html>

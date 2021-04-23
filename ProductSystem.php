@@ -21,12 +21,6 @@
     <form class="smallerButton" method="POST" action="Admin.php">
         <input type="submit" class="buttonStyle" value="Admin Console"/>
     </form>
-    </br>
-    <!-- REMOVE BEFORE PRESENTATION -->
-    </br>
-    <form class="smallerButton" method="POST" action="DeveloperView.php">
-        <input type="submit" class="buttonStyle" value="Developer ONLY Console"/>
-    </form>
 </div>
 </body>
 </html>

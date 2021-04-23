@@ -5,14 +5,37 @@
 <?php
 session_start();
 include 'NavHeader.php';
-
+$pdo;
+$Legacydsn;
+$qtyMap;
+try {
+    $pdo = ConnectToDatabase();
+    $Legacypdo = ConnectToLegacyDB();
+    $rs = $pdo->query("SELECT * FROM Inventory ORDER BY part_number;");
+    $partQtys = $rs->fetchAll(PDO::FETCH_ASSOC);
+    
+} catch(PDOexception $e) {
+    echo "Connection to database failed: " . $e->getMessage();
+}
 if (isset($_POST['update'])) {
-	$quantity = (int)$_POST['quantity'];
-	$productId = (int)$_POST['productId'];
+    $quantity = 0;
+    $productId = (int)$_POST['productId'];
+    if(isset($_SESSION['cart']) && isset($_SESSION['cart'][$productId])) {
+        $quantity = $_SESSION['cart'][$productId];
+    }
+	
     if($_POST['update'] == '+') {
-        $quantity++;
+        if($_SESSION["qty"][$productId] < ((int)$_POST['quantity'] + 1)) {
+            echo "Invalid Amount";
+        } else {
+            $quantity = (int)$_POST['quantity'] + 1;
+        }
     } else if($_POST['update'] == '-') {
-        $quantity--;
+        if($_SESSION["qty"][$productId] < ((int)$_POST['quantity'] - 1)) {
+            echo "Invalid Amount";
+        } else {
+            $quantity = (int)$_POST['quantity'] - 1;
+        }
 		if($quantity < 0) $quantity = 0;
     }
     if (isset($_SESSION['cart'])) {
@@ -21,28 +44,32 @@ if (isset($_POST['update'])) {
         $_SESSION['cart'] = array($productId => $quantity);
     }
 }
-
-function draw_table_Image($rows) { 
+function createProductCatelog($rowsParts, $partQtys) { 
     ?>
     <div class="grid-container" id="customers">
     <?php
-    foreach($rows as $row){
+
+    
+    foreach($partQtys as $pQty) {
+        $_SESSION["qty"][$pQty['part_number']] = $pQty['quantity_on_hand'];
+    }
+
+    foreach($rowsParts as $part){
         ?>
         <div class="grid-item"><tr><td>
         <form method="post"> 
-        <input type="hidden" name="productId" value="<?php echo $row['number'];?>" />
-        <div class="container">
-        <img width="120" height="100" src="<?php echo $row['pictureURL'] ?>" />
-        <p><?php echo $row['description']."<br/>".
-        "Part Number: ".$row['number']."<br/>".
-        "Amount: $".$row['price']."<br/>".
-        "Weight: ".$row['weight']." lbs";?></p>
-         <div>
-            <input type="submit" value="-" name="update" class="minus">
-            <input type="number" name='quantity' id='quantity' step="1" min="0" max="" class="qty" value="<?php echo (isset($_SESSION["cart"][$row['number']]))?$_SESSION["cart"][$row['number']]:'0';?>" size="16" inputmode="">
-            <input type="submit" value="+" name="update" class="plus">
-        </div>
-        </div>
+        <input type="hidden" name="productId" style="width:0; height=0;" value="<?php echo $part['number'];?>" />
+            <img src="<?php echo $part['pictureURL'] ?>" style="width:200px; height=200px;">
+            <h3 style="height: 50px;"><?php echo $part['description'] ?></h3>
+            <p class="price"><?php echo "$".$part['price'];?></p>
+            <div class="lineSpacing">
+            <p><?php echo "QTY AVAILABLE: ".$_SESSION["qty"][$part['number']];?></p>
+            <p><?php echo "Part Number: ".$part['number']?></p>
+            <p><?php echo "Weight: ".$part['weight']." lbs";?></p>
+            </div>
+            <p>  <input type="submit" value="-" name="update" class="minus">
+            <input type="number" name='quantity' id='quantity' step="1" min="0" max="" class="qty" value="<?php echo (isset($_SESSION["cart"][$part['number']]))?$_SESSION["cart"][$part['number']]:'0';?>" size="16" inputmode="">
+            <input type="submit" value="+" name="update" class="plus"></p>
         </form>
         </td></tr></div><?php
     }
@@ -50,24 +77,19 @@ function draw_table_Image($rows) {
 }
 
 try {
-    $Legacydsn = "mysql:host=blitz.cs.niu.edu;dbname=csci467";
-    $Legacypdo = new PDO($Legacydsn, $username = "student", $password = "student");
-    $Legacypdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);   
-     
     $rs = $Legacypdo->query("SELECT * FROM parts;");
     $rowsParts = $rs->fetchAll(PDO::FETCH_ASSOC);
-    
     ?>
     <div>
-    
-    <form method="get" action="AddPartToOrder.php">
-    <form method="post">
-    <div class="footer">
-        <input type="submit" class="inputSubmit" value="Checkout Order">
-    </div>
-    </form>
 
-    <?php draw_table_Image($rowsParts) ?>
+   
+    <?php createProductCatelog($rowsParts, $partQtys) ?>
+    <div class="footer">
+        <form method="get" action="CustomerOrder.php">
+        <form method="post">
+            <input type="submit" class="inputSubmit" value="Checkout Order">
+        </form>
+    </div>
     </div><?php
 }
 catch(PDOexception $e) { // handle that exception
